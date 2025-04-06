@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Switch, Linking, ActivityIndicator, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Switch, Linking, ActivityIndicator, ScrollView, ImageBackground, SafeAreaView, StatusBar } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Bell, Moon, Volume2, Clock, ChevronRight, Download, RefreshCw, Sun, Smartphone } from 'lucide-react-native';
 import { useState, useEffect } from 'react';
@@ -137,10 +137,12 @@ export default function SettingsScreen() {
   };
 
   return (
-    <LinearGradient
-      colors={[colors.background[0], colors.background[1]]}
-      style={styles.container}
-    >
+    <SafeAreaView style={[styles.container, { backgroundColor: theme === 'light' ? '#FFFFFF' : colors.background[0] }]}>
+      <StatusBar 
+        barStyle={theme === 'light' ? 'dark-content' : 'light-content'} 
+        backgroundColor={theme === 'light' ? '#FFFFFF' : theme === 'amoled' ? '#000000' : '#121212'} 
+        translucent 
+      />
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <Text style={[styles.title, { color: colors.text }]}>Ayarlar</Text>
 
@@ -292,7 +294,7 @@ export default function SettingsScreen() {
           </View>
         )} */}
       </ScrollView>
-    </LinearGradient>
+    </SafeAreaView>
   );
 }
 
@@ -307,7 +309,7 @@ const styles = StyleSheet.create({
   title: {
     fontWeight: '600',
     fontSize: 32,
-    marginTop: 60,
+    marginTop: 80,
     marginBottom: 20,
   },
   updateBanner: {

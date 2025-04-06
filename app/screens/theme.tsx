@@ -1,8 +1,9 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, StatusBar, SafeAreaView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Moon, Sun, Smartphone, ArrowLeft } from 'lucide-react-native';
 import { useTheme } from '../context/ThemeContext';
 import { useRouter } from 'expo-router';
+import { Stack } from 'expo-router';
 
 export default function ThemeScreen() {
   const { theme, setTheme, colors } = useTheme();
@@ -30,10 +31,17 @@ export default function ThemeScreen() {
   ] as const;
 
   return (
-    <LinearGradient
-      colors={[colors.background[0], colors.background[1]]}
-      style={styles.container}
-    >
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background[0] }]}>
+      <Stack.Screen 
+        options={{
+          headerShown: false,
+        }}
+      />
+      <StatusBar 
+        barStyle={theme === 'light' ? 'dark-content' : 'light-content'} 
+        backgroundColor={theme === 'light' ? '#FFFFFF' : theme === 'amoled' ? '#000000' : '#121212'} 
+      />
+      
       <View style={styles.header}>
         <TouchableOpacity 
           onPress={() => router.back()}
@@ -78,7 +86,7 @@ export default function ThemeScreen() {
           </TouchableOpacity>
         ))}
       </View>
-    </LinearGradient>
+    </SafeAreaView>
   );
 }
 

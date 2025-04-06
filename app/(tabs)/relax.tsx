@@ -1,6 +1,6 @@
 import React from 'react';
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Modal, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Modal, ImageBackground, SafeAreaView, StatusBar } from 'react-native';
 import { Audio } from 'expo-av';
 import { Cloud, Moon, Wind, Star, Music2, BedDouble, Clock, Flame, Play, Pause, X, ChevronDown, Volume2, Book, ChevronUp } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -14,6 +14,7 @@ type MainSound = {
   icon: any;
   color: string;
   file: any;
+  background: any;
 };
 
 type SubSound = {
@@ -37,13 +38,15 @@ const MAIN_SOUNDS: MainSound[] = [
     icon: Cloud,
     color: '#4CAF50',
     file: require('../../assets/sounds/rain.mp3'),
+    background: require('../../assets/images/rained_grove.jpeg'),
   },
   {
     id: 'forest',
     title: 'Orman',
     icon: Moon,
     color: '#4CAF50',
-    file: require('../../assets/sounds/nature.mp3'),
+    file: require('../../assets/sounds/grove.mp3'),
+    background: require('../../assets/images/grove.jpg'),
   },
   {
     id: 'ocean',
@@ -51,6 +54,7 @@ const MAIN_SOUNDS: MainSound[] = [
     icon: Wind,
     color: '#2196F3',
     file: require('../../assets/sounds/ocean.mp3'),
+    background: require('../../assets/images/ocean.jpg'),
   },
   {
     id: 'wind',
@@ -58,6 +62,7 @@ const MAIN_SOUNDS: MainSound[] = [
     icon: Wind,
     color: '#607D8B',
     file: require('../../assets/sounds/wind.mp3'),
+    background: require('../../assets/images/forest.jpg'),
   },
   {
     id: 'campfire',
@@ -65,6 +70,7 @@ const MAIN_SOUNDS: MainSound[] = [
     icon: Flame,
     color: '#FF5722',
     file: require('../../assets/sounds/campfire.mp3'),
+    background: require('../../assets/images/campfire.jpg'),
   }
 ];
 
@@ -126,7 +132,7 @@ const SUB_SOUNDS: SubSound[] = [
 ];
 
 export default function RelaxScreen() {
-  const { colors } = useTheme();
+  const { colors, theme } = useTheme();
   const [activeMainSound, setActiveMainSound] = useState<string | null>(null);
   const [activeSubSounds, setActiveSubSounds] = useState(new Set<string>());
   const [mainSound, setMainSound] = useState<Audio.Sound | null>(null);
@@ -571,10 +577,12 @@ export default function RelaxScreen() {
   }, []);
 
   return (
-    <LinearGradient
-      colors={[colors.background[0], colors.background[1]]}
-      style={styles.container}
-    >
+    <SafeAreaView style={[styles.container, { backgroundColor: theme === 'light' ? '#FFFFFF' : colors.background[0] }]}>
+      <StatusBar 
+        barStyle={theme === 'light' ? 'dark-content' : 'light-content'} 
+        backgroundColor={theme === 'light' ? '#FFFFFF' : theme === 'amoled' ? '#000000' : '#121212'} 
+        translucent 
+      />
       <ScrollView style={styles.content}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>Ana Sesler</Text>
         <View style={styles.mainSounds}>
@@ -583,8 +591,15 @@ export default function RelaxScreen() {
               key={sound.id}
               style={[
                 styles.soundButton,
-                { backgroundColor: colors.cardBackground },
-                activeMainSound === sound.id && { backgroundColor: colors.primary }
+                {
+                  backgroundColor: activeMainSound === sound.id
+                    ? `${sound.color}40`
+                    : colors.cardBackground,
+                  borderWidth: 1,
+                  borderColor: activeMainSound === sound.id
+                    ? sound.color
+                    : 'transparent',
+                },
               ]}
               onPress={() => {
                 if (activeMainSound === sound.id) {
@@ -594,14 +609,18 @@ export default function RelaxScreen() {
                 }
               }}
             >
-              <sound.icon
-                size={24}
-                color={activeMainSound === sound.id ? colors.text : colors.text}
-              />
-              <Text style={[
-                styles.soundText,
-                { color: activeMainSound === sound.id ? colors.text : colors.text }
-              ]}>
+              {React.createElement(sound.icon, {
+                size: 24,
+                color: activeMainSound === sound.id ? sound.color : colors.text,
+              })}
+              <Text
+                style={[
+                  styles.soundText,
+                  {
+                    color: activeMainSound === sound.id ? sound.color : colors.text,
+                  },
+                ]}
+              >
                 {sound.title}
               </Text>
             </TouchableOpacity>
@@ -615,19 +634,30 @@ export default function RelaxScreen() {
               key={sound.id}
               style={[
                 styles.soundButton,
-                { backgroundColor: colors.cardBackground },
-                activeSubSounds.has(sound.id) && { backgroundColor: colors.primary }
+                {
+                  backgroundColor: activeSubSounds.has(sound.id)
+                    ? `${sound.color}40`
+                    : colors.cardBackground,
+                  borderWidth: 1,
+                  borderColor: activeSubSounds.has(sound.id)
+                    ? sound.color
+                    : 'transparent',
+                },
               ]}
               onPress={() => toggleSubSound(sound)}
             >
-              <sound.icon
-                size={24}
-                color={activeSubSounds.has(sound.id) ? colors.text : colors.text}
-              />
-              <Text style={[
-                styles.soundText,
-                { color: activeSubSounds.has(sound.id) ? colors.text : colors.text }
-              ]}>
+              {React.createElement(sound.icon, {
+                size: 24,
+                color: activeSubSounds.has(sound.id) ? sound.color : colors.text,
+              })}
+              <Text
+                style={[
+                  styles.soundText,
+                  {
+                    color: activeSubSounds.has(sound.id) ? sound.color : colors.text,
+                  },
+                ]}
+              >
                 {sound.title}
               </Text>
             </TouchableOpacity>
@@ -684,7 +714,7 @@ export default function RelaxScreen() {
             onRequestClose={() => setIsModalVisible(false)}
           >
             <ImageBackground
-              source={require('../../assets/images/forest.jpg')}
+              source={activeMainSound ? MAIN_SOUNDS.find(s => s.id === activeMainSound)?.background : require('../../assets/images/default.jpg')}
               style={styles.modalBackground}
             >
               <LinearGradient
@@ -785,6 +815,6 @@ export default function RelaxScreen() {
           </Modal>
         </>
       )}
-    </LinearGradient>
+    </SafeAreaView>
   );
 }

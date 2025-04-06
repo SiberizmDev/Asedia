@@ -2,7 +2,7 @@
   "expo": {
     "name": "Asedia",
     "slug": "asedia",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "asedia",
@@ -14,7 +14,8 @@
       "infoPlist": {
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true
-        }
+        },
+        "UIViewControllerBasedStatusBarAppearance": true
       }
     },
     "android": {
@@ -24,7 +25,12 @@
         "backgroundColor": "#101013"
       },
       "versionCode": 1,
-      "permissions": ["INTERNET", "ACCESS_NETWORK_STATE"]
+      "permissions": ["INTERNET", "ACCESS_NETWORK_STATE"],
+      "softwareKeyboardLayoutMode": "pan",
+      "navigationBar": {
+        "backgroundColor": "#101013",
+        "visible": "immersive"
+      }
     },
     "web": {
       "bundler": "metro",

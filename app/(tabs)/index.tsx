@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ImageBackground, Modal, Dimensions, PanResponder, Animated, Platform, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ImageBackground, Modal, Dimensions, PanResponder, Animated, Platform, SafeAreaView, StatusBar } from 'react-native';
 import { Audio } from 'expo-av';
 import { Cloud, Moon, Wind, Star, Music2, BedDouble, Clock, ArrowLeft, Leaf, Tent, Play, Pause, X, Timer } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -8,16 +8,23 @@ import { BlurView } from 'expo-blur';
 
 const SOUND_URLS = {
   rain: require('../../assets/sounds/rain.mp3'),
+  grove: require('../../assets/sounds/grove.mp3'),
   night: require('../../assets/sounds/night-ambiance.mp3'),
   wind: require('../../assets/sounds/wind.mp3'),
   stars: require('../../assets/sounds/stars.mp3'),
   lullaby: require('../../assets/sounds/lullaby.mp3'),
   dream: require('../../assets/sounds/dream.mp3'),
   timer: require('../../assets/sounds/timer.mp3'),
-  space: require('../../assets/sounds/space.mp3'),
+  memory: require('../../assets/sounds/memory.mp3'),
   calm: require('../../assets/sounds/bamboo.mp3'),
-  grove: require('../../assets/sounds/wind.mp3'),
-  campfire: require('../../assets/sounds/campfire.mp3')
+  nightsea: require('../../assets/sounds/sea.mp3'),
+  river: require('../../assets/sounds/river.mp3'),
+  campfire: require('../../assets/sounds/campfire.mp3'),
+  campfire2: require('../../assets/sounds/campfire-2.mp3'),
+  campfire3: require('../../assets/sounds/campfire-3.mp3'),
+  winter: require('../../assets/sounds/winter.mp3'),
+  hope: require('../../assets/sounds/hope.mp3'),
+  clouds: require('../../assets/sounds/clouds.mp3')
 } as const;
 
 type SoundId = keyof typeof SOUND_URLS;
@@ -45,17 +52,26 @@ const CATEGORIES: Category[] = [
     sounds: [
       {
         id: 'rain',
-        title: 'Yaz sahili',
-        description: 'Dalgaların huzur veren sesi',
+        title: 'Yağmurlu Koru',
+        description: 'Yağmurlu bir gün',
         icon: Cloud,
         color: '#4CAF50',
-        background: require('../../assets/images/forest.jpg'),
+        background: require('../../assets/images/rained_grove.jpeg'),
         isActive: false
       },
       {
         id: 'grove',
-        title: 'Sabah güneşi',
-        description: 'Ormanın dinlendirici sesleri',
+        title: 'Koru',
+        description: 'Doğanın esintisi',
+        icon: Cloud,
+        color: '#4CAF50',
+        background: require('../../assets/images/grove.jpg'),
+        isActive: false
+      },
+      {
+        id: 'night',
+        title: 'Gece',
+        description: 'Geceniin dinlendirici sesleri',
         icon: Leaf,
         color: '#4CAF50',
         background: require('../../assets/images/night.jpg'),
@@ -63,46 +79,100 @@ const CATEGORIES: Category[] = [
       },
       {
         id: 'campfire',
-        title: 'Gece kampı',
+        title: 'Şömine',
         description: 'Kamp ateşinin çıtırtısı',
         icon: Tent,
         color: '#FF5722',
         background: require('../../assets/images/campfire.jpg'),
         isActive: false
       },
+      {
+        id: 'campfire2',
+        title: 'Şömine 2',
+        description: 'Kamp ateşinin çıtırtısı',
+        icon: Tent,
+        color: '#FF5722',
+        background: require('../../assets/images/campfire-2.jpg'),
+        isActive: false
+      },
+      {
+        id: 'campfire3',
+        title: 'Şömine 3',
+        description: 'Kamp ateşinin çıtırtısı',
+        icon: Tent,
+        color: '#FF5722',
+        background: require('../../assets/images/campfire-3.jpg'),
+        isActive: false
+      },
+      {
+        id: 'nightsea',
+        title: 'Okyanus Esintisi',
+        description: 'Okyanusun sessiz sessizliği',
+        icon: Tent,
+        color: '#FF5722',
+        background: require('../../assets/images/ocean.jpg'),
+        isActive: false
+      },
+      {
+        id: 'river',
+        title: 'Gece Nehri',
+        description: 'Akarsuyun uyandırıcı sesi',
+        icon: Tent,
+        color: '#FF5722',
+        background: require('../../assets/images/default.jpg'),
+        isActive: false
+      }
     ]
   },
   {
-    title: "Müzik",
+    title: "Sakinleş",
     subtitle: "Ruha dokunan melodiler",
     sounds: [
       {
-        id: 'space',
-        title: 'Uzay yolculuğu',
-        description: 'Uzayın derinliklerinden',
+        id: 'memory',
+        title: 'Hatıra',
+        description: 'Hatıralarınıza dalın',
         icon: Star,
         color: '#9C27B0',
-        background: require('../../assets/images/space.jpg'),
+        background: require('../../assets/images/memory.jpeg'),
         isActive: false
       },
       {
-        id: 'stars',
-        title: 'Umut',
-        description: 'Huzur veren melodiler',
+        id: 'winter',
+        title: 'Kış',
+        description: 'Kış | by TOSH',
         icon: Music2,
         color: '#2196F3',
-        background: require('../../assets/images/stars.jpg'),
+        background: require('../../assets/images/winter.jpeg'),
         isActive: false
       },
       {
-        id: 'night',
-        title: 'Ay ışığı',
-        description: 'Sakin gece melodileri',
-        icon: Moon,
-        color: '#607D8B',
-        background: require('../../assets/images/night.jpg'),
+        id: 'hope',
+        title: 'Umut',
+        description: 'Umudunuzu canlandırın',
+        icon: Music2,
+        color: '#2196F3',
+        background: require('../../assets/images/hope.jpeg'),
         isActive: false
       },
+      {
+        id: 'clouds',
+        title: 'Bulutlar',
+        description: 'Bulutlar | by TOSH',
+        icon: Music2,
+        color: '#2196F3',
+        background: require('../../assets/images/clouds.jpg'),
+        isActive: false
+      },
+      // {
+      //   id: 'night',
+      //   title: 'Ay ışığı',
+      //   description: 'Sakin gece melodileri',
+      //   icon: Moon,
+      //   color: '#607D8B',
+      //   background: require('../../assets/images/night.jpg'),
+      //   isActive: false
+      // },
     ]
   },
   {
@@ -382,263 +452,267 @@ export default function SleepScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <ImageBackground
-        source={activeSound?.background || require('../../assets/images/forest.jpg')}
-        style={StyleSheet.absoluteFill}
-        blurRadius={80}
-      >
-        <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.7)' }]} />
-      </ImageBackground>
+    <SafeAreaView style={[styles.container, { backgroundColor: 'transparent' }]}>
+      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <View style={styles.container}>
+        <ImageBackground
+          source={activeSound?.background || require('../../assets/images/forest.jpg')}
+          style={StyleSheet.absoluteFill}
+          blurRadius={80}
+        >
+          <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.7)' }]} />
+        </ImageBackground>
 
-      <ScrollView style={styles.content}>
-        {CATEGORIES.map((category, index) => (
-          <View key={index} style={styles.categorySection}>
-            <View style={styles.categoryHeader}>
-              <Text style={styles.categoryTitle}>{category.title}</Text>
-              <Text style={styles.categorySubtitle}>{category.subtitle}</Text>
-            </View>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.soundsRow}>
-              {category.sounds.map((sound) => (
-                <TouchableOpacity
-                  key={sound.id}
-                  style={[
-                    styles.soundCard,
-                    activeSound?.id === sound.id && styles.activeSoundCard
-                  ]}
-                  onPress={() => handleSoundPress(sound)}
-                >
-                  <ImageBackground
-                    source={sound.background}
-                    style={styles.soundCardBackground}
-                    imageStyle={styles.soundCardImage}
+        <ScrollView style={styles.content}>
+          {CATEGORIES.map((category, index) => (
+            <View key={index} style={styles.categorySection}>
+              <View style={styles.categoryHeader}>
+                <Text style={styles.categoryTitle}>{category.title}</Text>
+                <Text style={styles.categorySubtitle}>{category.subtitle}</Text>
+              </View>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.soundsRow}>
+                {category.sounds.map((sound) => (
+                  <TouchableOpacity
+                    key={sound.id}
+                    style={[
+                      styles.soundCard,
+                      activeSound?.id === sound.id && styles.activeSoundCard,
+                      sound === category.sounds[category.sounds.length - 1] && styles.lastSoundCard
+                    ]}
+                    onPress={() => handleSoundPress(sound)}
                   >
-                    <LinearGradient
-                      colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.7)']}
-                      style={styles.soundCardOverlay}
+                    <ImageBackground
+                      source={sound.background}
+                      style={styles.soundCardBackground}
+                      imageStyle={styles.soundCardImage}
                     >
-                      {activeSound?.id === sound.id && (
-                        <View style={styles.activeCardControls}>
+                      <LinearGradient
+                        colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.7)']}
+                        style={styles.soundCardOverlay}
+                      >
+                        {activeSound?.id === sound.id && (
+                          <View style={styles.activeCardControls}>
+                            <TouchableOpacity
+                              style={styles.cardControlButton}
+                              onPress={togglePlayback}
+                            >
+                              {isPlaying ? (
+                                <Pause size={24} color="#fff" />
+                              ) : (
+                                <Play size={24} color="#fff" />
+                              )}
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              style={styles.cardControlButton}
+                              onPress={() => {
+                                if (currentSound) {
+                                  currentSound.stopAsync();
+                                  currentSound.unloadAsync();
+                                }
+                                setActiveSound(null);
+                                setCurrentSound(null);
+                                setIsPlaying(false);
+                              }}
+                            >
+                              <X size={24} color="#fff" />
+                            </TouchableOpacity>
+                          </View>
+                        )}
+                        <Text style={styles.soundCardTitle}>{sound.title}</Text>
+                      </LinearGradient>
+                    </ImageBackground>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+          ))}
+        </ScrollView>
+
+        {activeSound && (
+          <>
+            <View style={styles.floatingControls}>
+              <ImageBackground
+                source={activeSound.background}
+                style={StyleSheet.absoluteFill}
+                blurRadius={25}
+              >
+                <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill}>
+                  <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.3)' }]} />
+                </BlurView>
+              </ImageBackground>
+              <View style={styles.controlsContent}>
+
+                <TouchableOpacity
+                  style={styles.playbarControl}
+                  onPress={() => {
+                    if (!remainingTime) {
+                      startTimer(300); // Default to 5 minutes (300 seconds)
+                    } else {
+                      cancelTimer();
+                    }
+                  }}
+                >
+                  <Timer size={24} color="#fff" />
+                  {remainingTime && (
+                    <View style={styles.timerBadge}>
+                      <Text style={styles.timerBadgeText}>{formatTime(remainingTime)}</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+
+
+                <TouchableOpacity
+                  style={styles.playbarControl}
+                  onPress={togglePlayback}
+                >
+                  {isPlaying ? (
+                    <Pause size={24} color="#fff" />
+                  ) : (
+                    <Play size={24} color="#fff" />
+                  )}
+                </TouchableOpacity>
+
+
+                <TouchableOpacity
+                  style={styles.playbarControl}
+                  onPress={() => {
+                    if (currentSound) {
+                      currentSound.stopAsync();
+                      currentSound.unloadAsync();
+                    }
+                    setActiveSound(null);
+                    setCurrentSound(null);
+                    setIsPlaying(false);
+                    cancelTimer();
+                  }}
+                >
+                  <X size={24} color="#fff" />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={styles.floatingPlaybar}>
+              <ImageBackground
+                source={activeSound.background}
+                style={StyleSheet.absoluteFill}
+                blurRadius={25}
+              >
+                <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill}>
+                  <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.3)' }]} />
+                </BlurView>
+              </ImageBackground>
+              <TouchableOpacity
+                style={styles.playbarContent}
+                onPress={() => setSelectedSound(activeSound)}
+              >
+                <ImageBackground
+                  source={activeSound.background}
+                  style={styles.playbarImage}
+                  imageStyle={{ borderRadius: 8 }}
+                />
+                <View style={styles.playbarInfo}>
+                  <Text style={styles.playbarTitle}>{activeSound.title}</Text>
+                  <Text style={styles.playbarDescription}>{activeSound.description}</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
+
+        <Modal
+          visible={selectedSound !== null}
+          animationType="slide"
+          transparent={false}
+          presentationStyle="fullScreen"
+          onRequestClose={() => setSelectedSound(null)}
+        >
+          {selectedSound && (
+            <View style={styles.modalContainer}>
+              <ImageBackground
+                source={selectedSound.background}
+                style={StyleSheet.absoluteFill}
+              >
+                <BlurView intensity={20} style={StyleSheet.absoluteFill} />
+                <LinearGradient
+                  colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.8)']}
+                  style={styles.modalOverlay}
+                >
+                  <TouchableOpacity
+                    style={styles.closeButton}
+                    onPress={() => setSelectedSound(null)}
+                  >
+                    <ArrowLeft size={24} color="#fff" />
+                  </TouchableOpacity>
+
+                  <View style={styles.modalInfo}>
+                    <Text style={styles.modalTitle}>{selectedSound.title}</Text>
+                    <Text style={styles.modalDescription}>{selectedSound.description}</Text>
+
+                    <View style={styles.playbackControls}>
+                      <TouchableOpacity
+                        style={styles.playPauseButton}
+                        onPress={togglePlayback}
+                      >
+                        {isPlaying ? (
+                          <Pause size={32} color="#fff" />
+                        ) : (
+                          <Play size={32} color="#fff" />
+                        )}
+                      </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.timerSection}>
+                      <Text style={styles.timerTitle}>
+                        {remainingTime ? 'Kalan Süre' : 'Zamanlayıcı'}
+                      </Text>
+
+                      {!remainingTime ? (
+                        <View style={styles.timerOptions}>
+                          {timerOptions.map((option) => (
+                            <TouchableOpacity
+                              key={option.value}
+                              style={[
+                                styles.timerButton,
+                                {
+                                  backgroundColor: activeTimer === option.value ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
+                                  borderColor: activeTimer === option.value ? '#fff' : 'rgba(255, 255, 255, 0.5)',
+                                },
+                              ]}
+                              onPress={() => startTimer(option.value)}
+                            >
+                              <Text
+                                style={[
+                                  styles.timerButtonText,
+                                  { color: activeTimer === option.value ? '#fff' : 'rgba(255, 255, 255, 0.7)' },
+                                ]}
+                              >
+                                {option.label}
+                              </Text>
+                            </TouchableOpacity>
+                          ))}
+                        </View>
+                      ) : (
+                        <View style={styles.timerDisplay}>
+                          <Text style={styles.timerCountdown}>
+                            {formatTime(remainingTime)}
+                          </Text>
                           <TouchableOpacity
-                            style={styles.cardControlButton}
-                            onPress={togglePlayback}
+                            style={styles.timerCancel}
+                            onPress={cancelTimer}
                           >
-                            {isPlaying ? (
-                              <Pause size={24} color="#fff" />
-                            ) : (
-                              <Play size={24} color="#fff" />
-                            )}
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            style={styles.cardControlButton}
-                            onPress={() => {
-                              if (currentSound) {
-                                currentSound.stopAsync();
-                                currentSound.unloadAsync();
-                              }
-                              setActiveSound(null);
-                              setCurrentSound(null);
-                              setIsPlaying(false);
-                            }}
-                          >
-                            <X size={24} color="#fff" />
+                            <Text style={styles.timerCancelText}>İptal Et</Text>
                           </TouchableOpacity>
                         </View>
                       )}
-                      <Text style={styles.soundCardTitle}>{sound.title}</Text>
-                    </LinearGradient>
-                  </ImageBackground>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
-        ))}
-      </ScrollView>
-
-      {activeSound && (
-        <>
-          <View style={styles.floatingControls}>
-            <ImageBackground
-              source={activeSound.background}
-              style={StyleSheet.absoluteFill}
-              blurRadius={25}
-            >
-              <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill}>
-                <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.3)' }]} />
-              </BlurView>
-            </ImageBackground>
-            <View style={styles.controlsContent}>
-
-              <TouchableOpacity
-                style={styles.playbarControl}
-                onPress={() => {
-                  if (!remainingTime) {
-                    startTimer(300); // Default to 5 minutes (300 seconds)
-                  } else {
-                    cancelTimer();
-                  }
-                }}
-              >
-                <Timer size={24} color="#fff" />
-                {remainingTime && (
-                  <View style={styles.timerBadge}>
-                    <Text style={styles.timerBadgeText}>{formatTime(remainingTime)}</Text>
+                    </View>
                   </View>
-                )}
-              </TouchableOpacity>
-
-
-              <TouchableOpacity
-                style={styles.playbarControl}
-                onPress={togglePlayback}
-              >
-                {isPlaying ? (
-                  <Pause size={24} color="#fff" />
-                ) : (
-                  <Play size={24} color="#fff" />
-                )}
-              </TouchableOpacity>
-
-
-              <TouchableOpacity
-                style={styles.playbarControl}
-                onPress={() => {
-                  if (currentSound) {
-                    currentSound.stopAsync();
-                    currentSound.unloadAsync();
-                  }
-                  setActiveSound(null);
-                  setCurrentSound(null);
-                  setIsPlaying(false);
-                  cancelTimer();
-                }}
-              >
-                <X size={24} color="#fff" />
-              </TouchableOpacity>
+                </LinearGradient>
+              </ImageBackground>
             </View>
-          </View>
-
-          <View style={styles.floatingPlaybar}>
-            <ImageBackground
-              source={activeSound.background}
-              style={StyleSheet.absoluteFill}
-              blurRadius={25}
-            >
-              <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill}>
-                <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.3)' }]} />
-              </BlurView>
-            </ImageBackground>
-            <TouchableOpacity
-              style={styles.playbarContent}
-              onPress={() => setSelectedSound(activeSound)}
-            >
-              <ImageBackground
-                source={activeSound.background}
-                style={styles.playbarImage}
-                imageStyle={{ borderRadius: 8 }}
-              />
-              <View style={styles.playbarInfo}>
-                <Text style={styles.playbarTitle}>{activeSound.title}</Text>
-                <Text style={styles.playbarDescription}>{activeSound.description}</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-        </>
-      )}
-
-      <Modal
-        visible={selectedSound !== null}
-        animationType="slide"
-        transparent={false}
-        presentationStyle="fullScreen"
-        onRequestClose={() => setSelectedSound(null)}
-      >
-        {selectedSound && (
-          <View style={styles.modalContainer}>
-            <ImageBackground
-              source={selectedSound.background}
-              style={StyleSheet.absoluteFill}
-            >
-              <BlurView intensity={20} style={StyleSheet.absoluteFill} />
-              <LinearGradient
-                colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.8)']}
-                style={styles.modalOverlay}
-              >
-                <TouchableOpacity
-                  style={styles.closeButton}
-                  onPress={() => setSelectedSound(null)}
-                >
-                  <ArrowLeft size={24} color="#fff" />
-                </TouchableOpacity>
-
-                <View style={styles.modalInfo}>
-                  <Text style={styles.modalTitle}>{selectedSound.title}</Text>
-                  <Text style={styles.modalDescription}>{selectedSound.description}</Text>
-
-                  <View style={styles.playbackControls}>
-                    <TouchableOpacity
-                      style={styles.playPauseButton}
-                      onPress={togglePlayback}
-                    >
-                      {isPlaying ? (
-                        <Pause size={32} color="#fff" />
-                      ) : (
-                        <Play size={32} color="#fff" />
-                      )}
-                    </TouchableOpacity>
-                  </View>
-
-                  <View style={styles.timerSection}>
-                    <Text style={styles.timerTitle}>
-                      {remainingTime ? 'Kalan Süre' : 'Zamanlayıcı'}
-                    </Text>
-
-                    {!remainingTime ? (
-                      <View style={styles.timerOptions}>
-                        {timerOptions.map((option) => (
-                          <TouchableOpacity
-                            key={option.value}
-                            style={[
-                              styles.timerButton,
-                              {
-                                backgroundColor: activeTimer === option.value ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
-                                borderColor: activeTimer === option.value ? '#fff' : 'rgba(255, 255, 255, 0.5)',
-                              },
-                            ]}
-                            onPress={() => startTimer(option.value)}
-                          >
-                            <Text
-                              style={[
-                                styles.timerButtonText,
-                                { color: activeTimer === option.value ? '#fff' : 'rgba(255, 255, 255, 0.7)' },
-                              ]}
-                            >
-                              {option.label}
-                            </Text>
-                          </TouchableOpacity>
-                        ))}
-                      </View>
-                    ) : (
-                      <View style={styles.timerDisplay}>
-                        <Text style={styles.timerCountdown}>
-                          {formatTime(remainingTime)}
-                        </Text>
-                        <TouchableOpacity
-                          style={styles.timerCancel}
-                          onPress={cancelTimer}
-                        >
-                          <Text style={styles.timerCancelText}>İptal Et</Text>
-                        </TouchableOpacity>
-                      </View>
-                    )}
-                  </View>
-                </View>
-              </LinearGradient>
-            </ImageBackground>
-          </View>
-        )}
-      </Modal>
-    </View>
+          )}
+        </Modal>
+      </View>
+    </SafeAreaView>
   );
 }
 
@@ -664,12 +738,13 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 24,
     fontFamily: 'Inter-SemiBold',
+    marginTop: 40,
   },
   categorySubtitle: {
     color: 'rgba(255,255,255,0.6)',
     fontSize: 16,
     fontFamily: 'Inter-Regular',
-    marginTop: 4,
+    marginTop: 8,
   },
   soundsRow: {
     paddingLeft: 20,
@@ -680,6 +755,9 @@ const styles = StyleSheet.create({
     marginRight: 15,
     borderRadius: 20,
     overflow: 'hidden',
+  },
+  lastSoundCard: {
+    marginRight: 40, // Ensure separation from the right edge
   },
   soundCardBackground: {
     width: '100%',
