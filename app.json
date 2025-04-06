@@ -2,7 +2,7 @@
   "expo": {
     "name": "Asedia",
     "slug": "asedia",
-    "version": "1.2.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "asedia",
@@ -10,7 +10,12 @@
     "backgroundColor": "#101013",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.asena.space"
+      "bundleIdentifier": "com.asena.space",
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      }
     },
     "android": {
       "package": "com.asena.space",
@@ -18,7 +23,8 @@
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#101013"
       },
-      "versionCode": 1
+      "versionCode": 1,
+      "permissions": ["INTERNET", "ACCESS_NETWORK_STATE"]
     },
     "web": {
       "bundler": "metro",
@@ -27,7 +33,15 @@
     },
     "plugins": [
       "expo-router",
-      "expo-font"
+      "expo-font",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#ffffff",
+          "sounds": ["./assets/notification.wav"]
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
@@ -39,6 +53,13 @@
       "eas": {
         "projectId": "73b063a3-1c70-4291-9653-2a51150c88e5"
       }
+    },
+    "notification": {
+      "icon": "./assets/notification-icon.png",
+      "color": "#ffffff",
+      "iosDisplayInForeground": true,
+      "androidMode": "default",
+      "androidCollapsedTitle": "Yeni Güncelleme"
     }
   }
 }

@@ -1,17 +1,36 @@
-import { useEffect } from 'react';
+import { DarkTheme, ThemeProvider as NavigationThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { useFrameworkReady } from '@/hooks/useFrameworkReady';
+import * as SplashScreen from 'expo-splash-screen';
+import { useEffect } from 'react';
+import { ThemeProvider } from './context/ThemeContext';
+
+export {
+  ErrorBoundary,
+} from 'expo-router';
+
+export const unstable_settings = {
+  initialRouteName: '(tabs)',
+};
+
+SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  useFrameworkReady();
+  useEffect(() => {
+    SplashScreen.hideAsync();
+  }, []);
 
+  return <RootLayoutNav />;
+}
+
+function RootLayoutNav() {
   return (
-    <>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </>
+    <ThemeProvider>
+      <NavigationThemeProvider value={DarkTheme}>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+        </Stack>
+      </NavigationThemeProvider>
+    </ThemeProvider>
   );
 }

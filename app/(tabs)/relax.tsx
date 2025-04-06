@@ -2,10 +2,11 @@ import React from 'react';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Modal, ImageBackground } from 'react-native';
 import { Audio } from 'expo-av';
-import { Cloud, Moon, Wind, Star, Music2, BedDouble, Clock, Flame, Play, Pause, X, ChevronDown, Volume2, Book } from 'lucide-react-native';
+import { Cloud, Moon, Wind, Star, Music2, BedDouble, Clock, Flame, Play, Pause, X, ChevronDown, Volume2, Book, ChevronUp } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useFonts, Inter_400Regular, Inter_600SemiBold } from '@expo-google-fonts/inter';
+import { useFonts, Inter_400Regular, Inter_600SemiBold, Inter_500Medium } from '@expo-google-fonts/inter';
 import Slider from '@react-native-community/slider';
+import { useTheme } from '../context/ThemeContext';
 
 type MainSound = {
   id: string;
@@ -119,12 +120,13 @@ const SUB_SOUNDS: SubSound[] = [
     icon: Book,
     color: '#607D8B',
     file: require('../../assets/sounds/alt_sounds/book/book-1.mp3'),
-    minInterval: 15000,
-    maxInterval: 45000,
+    minInterval: 5000,
+    maxInterval: 10000,
   }
 ];
 
 export default function RelaxScreen() {
+  const { colors } = useTheme();
   const [activeMainSound, setActiveMainSound] = useState<string | null>(null);
   const [activeSubSounds, setActiveSubSounds] = useState(new Set<string>());
   const [mainSound, setMainSound] = useState<Audio.Sound | null>(null);
@@ -134,31 +136,173 @@ export default function RelaxScreen() {
   const [volumes, setVolumes] = useState<SoundVolume>({});
   const [subSounds, setSubSounds] = useState<{ [key: string]: Audio.Sound }>({});
 
-  // Configure audio session once when component mounts
-  useEffect(() => {
-    const setupAudio = async () => {
-      try {
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: false,
-          staysActiveInBackground: true,
-          playsInSilentModeIOS: true,
-          shouldDuckAndroid: false,
-          playThroughEarpieceAndroid: false,
-        });
-      } catch (error) {
-        console.error('Error setting up audio mode:', error);
-      }
-    };
-    setupAudio();
+  const { width } = Dimensions.get('window');
+  const buttonSize = (width - 40 - 20) / 3;
 
-    // Cleanup
-    return () => {
-      if (mainSound) {
-        mainSound.unloadAsync();
-      }
-      Object.values(subSoundTimers).forEach(timer => clearTimeout(timer));
-    };
-  }, []);
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    content: {
+      flex: 1,
+      padding: 20,
+      paddingBottom: 80,
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontFamily: 'Inter-SemiBold',
+      marginBottom: 15,
+      marginTop: 20,
+    },
+    mainSounds: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 10,
+      marginBottom: 20,
+    },
+    subSounds: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 10,
+    },
+    soundButton: {
+      width: buttonSize,
+      height: buttonSize,
+      borderRadius: buttonSize / 2,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    soundText: {
+      marginTop: 8,
+      fontSize: 12,
+      fontFamily: 'Inter-Regular',
+    },
+    floatingPlaybar: {
+      position: 'absolute',
+      bottom: 20,
+      left: 20,
+      right: 20,
+      borderRadius: 16,
+      padding: 16,
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 4,
+      },
+      shadowOpacity: 0.3,
+      shadowRadius: 4.65,
+      elevation: 8,
+    },
+    playbarContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    playbarLeft: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+    },
+    coverImage: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 12,
+    },
+    playbarInfo: {
+      flex: 1,
+    },
+    playbarTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    playbarSubtitle: {
+      fontSize: 13,
+      marginTop: 4,
+    },
+    playbarRight: {
+      flexDirection: 'row',
+      gap: 8,
+    },
+    iconButton: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    modalBackground: {
+      flex: 1,
+      width: '100%',
+      height: '100%',
+    },
+    modalContent: {
+      flex: 1,
+      padding: 20,
+    },
+    modalPlaybackInfo: {
+      flex: 1,
+      justifyContent: 'flex-end',
+      alignItems: 'center',
+      paddingBottom: 100,
+    },
+    modalTitle: {
+      fontSize: 32,
+      fontFamily: 'Inter-SemiBold',
+      textAlign: 'center',
+    },
+    modalSubtitle: {
+      fontSize: 16,
+      fontFamily: 'Inter-Regular',
+      marginTop: 8,
+      textAlign: 'center',
+    },
+    volumeControls: {
+      width: '100%',
+      marginTop: 40,
+      marginBottom: 40,
+    },
+    volumeSection: {
+      marginBottom: 20,
+    },
+    volumeSlider: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 10,
+      paddingHorizontal: 10,
+    },
+    modalControls: {
+      flexDirection: 'row',
+      gap: 20,
+      marginTop: 40,
+    },
+    modalPlaybackButton: {
+      width: 64,
+      height: 64,
+      borderRadius: 32,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    modalStopButton: {
+      opacity: 0.8,
+    },
+    closeButton: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 12,
+    },
+    volumeTitle: {
+      fontSize: 16,
+      fontFamily: 'Inter_500Medium',
+      marginBottom: 8,
+      color: colors.text,
+    },
+  });
 
   const loadMainSound = useCallback(async (sound: MainSound) => {
     try {
@@ -203,6 +347,7 @@ export default function RelaxScreen() {
         return;
       }
 
+      console.log(`Playing ${sound.id}`);
       const subSound = new Audio.Sound();
       await subSound.loadAsync(sound.file);
       await subSound.setVolumeAsync(volumes[sound.id] || 0.3);
@@ -211,72 +356,112 @@ export default function RelaxScreen() {
       // Store the sound object in state
       setSubSounds(prev => ({ ...prev, [sound.id]: subSound }));
 
+      // Set up playback status update handler
       subSound.setOnPlaybackStatusUpdate(async (status) => {
         if (status.isLoaded && status.didJustFinish) {
+          // Unload the current sound instance
           await subSound.unloadAsync();
+          
+          // Remove from active sounds
           setSubSounds(prev => {
             const newSubSounds = { ...prev };
             delete newSubSounds[sound.id];
             return newSubSounds;
           });
-
-          // Schedule next play after the current sound finishes
-          if (activeSubSounds.has(sound.id) && isMainSoundPlaying) {
-            scheduleNextPlay(sound);
-          }
         }
       });
+
     } catch (error) {
       console.error('Error playing sub sound:', error);
     }
-  }, [isMainSoundPlaying, volumes, subSounds, activeSubSounds, scheduleNextPlay]);
+  }, [isMainSoundPlaying, volumes, subSounds]);
 
-  const scheduleNextPlay = useCallback((sound: SubSound) => {
-    if (!isMainSoundPlaying) return;
+  // Effect to handle repeating sounds
+  useEffect(() => {
+    // Clean up previous intervals
+    Object.values(subSoundTimers).forEach(timer => clearTimeout(timer));
+    setSubSoundTimers({});
 
-    const interval = Math.random() * (sound.maxInterval - sound.minInterval) + sound.minInterval;
-    console.log(`Scheduling next play for ${sound.id} in ${interval}ms`);
-
-    const timer = setTimeout(() => {
-      if (activeSubSounds.has(sound.id) && isMainSoundPlaying) {
-        console.log(`Playing ${sound.id} after interval`);
-        playSubSound(sound);
-      }
-    }, interval);
-
-    setSubSoundTimers(prev => ({ ...prev, [sound.id]: timer }));
-  }, [activeSubSounds, isMainSoundPlaying, playSubSound]);
-
-  const toggleSubSound = useCallback((sound: SubSound) => {
-    const newActiveSubSounds = new Set(activeSubSounds);
-
-    if (activeSubSounds.has(sound.id)) {
-      // Stop sub sound
-      if (subSoundTimers[sound.id]) {
-        clearTimeout(subSoundTimers[sound.id]);
-        const newTimers = { ...subSoundTimers };
-        delete newTimers[sound.id];
-        setSubSoundTimers(newTimers);
-      }
-      // Unload the sound
-      if (subSounds[sound.id]) {
-        subSounds[sound.id].unloadAsync();
-        setSubSounds(prev => {
-          const newSubSounds = { ...prev };
-          delete newSubSounds[sound.id];
-          return newSubSounds;
-        });
-      }
-      newActiveSubSounds.delete(sound.id);
-    } else {
-      newActiveSubSounds.add(sound.id);
-      if (isMainSoundPlaying) {
-        playSubSound(sound);
-      }
+    // Set up new intervals for active sounds
+    if (isMainSoundPlaying) {
+      activeSubSounds.forEach(soundId => {
+        const sound = SUB_SOUNDS.find(s => s.id === soundId);
+        if (sound) {
+          const timer = setInterval(() => {
+            playSubSound(sound);
+          }, 5000);
+          
+          setSubSoundTimers(prev => ({ ...prev, [soundId]: timer }));
+        }
+      });
     }
 
-    setActiveSubSounds(newActiveSubSounds);
-  }, [activeSubSounds, subSoundTimers, playSubSound, isMainSoundPlaying, subSounds]);
+    // Cleanup function
+    return () => {
+      Object.values(subSoundTimers).forEach(timer => clearInterval(timer));
+    };
+  }, [isMainSoundPlaying, activeSubSounds]);
+
+  const toggleSubSound = useCallback((sound: SubSound) => {
+    setActiveSubSounds(prev => {
+      const newSet = new Set(prev);
+      
+      if (newSet.has(sound.id)) {
+        // Stop and cleanup the sound
+        if (subSoundTimers[sound.id]) {
+          clearInterval(subSoundTimers[sound.id]);
+          setSubSoundTimers(prev => {
+            const newTimers = { ...prev };
+            delete newTimers[sound.id];
+            return newTimers;
+          });
+        }
+        if (subSounds[sound.id]) {
+          subSounds[sound.id].unloadAsync();
+          setSubSounds(prev => {
+            const newSounds = { ...prev };
+            delete newSounds[sound.id];
+            return newSounds;
+          });
+        }
+        newSet.delete(sound.id);
+      } else {
+        // Add and start playing if main sound is active
+        newSet.add(sound.id);
+        if (isMainSoundPlaying) {
+          playSubSound(sound);
+        }
+      }
+      
+      return newSet;
+    });
+  }, [isMainSoundPlaying, subSounds, subSoundTimers, playSubSound]);
+
+  // Configure audio session once when component mounts
+  useEffect(() => {
+    const setupAudio = async () => {
+      try {
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: false,
+          staysActiveInBackground: true,
+          playsInSilentModeIOS: true,
+          shouldDuckAndroid: false,
+          playThroughEarpieceAndroid: false,
+        });
+      } catch (error) {
+        console.error('Error setting up audio mode:', error);
+      }
+    };
+    setupAudio();
+
+    // Cleanup
+    return () => {
+      if (mainSound) {
+        mainSound.unloadAsync();
+      }
+      Object.values(subSoundTimers).forEach(timer => clearTimeout(timer));
+    };
+  }, []);
 
   const resetAllSounds = useCallback(async () => {
     try {
@@ -337,7 +522,6 @@ export default function RelaxScreen() {
             const subSound = SUB_SOUNDS.find(s => s.id === subSoundId);
             if (subSound) {
               playSubSound(subSound);
-              scheduleNextPlay(subSound);
             }
           });
         }
@@ -356,7 +540,7 @@ export default function RelaxScreen() {
         await playMainSound(currentSound);
       }
     }
-  }, [activeMainSound, activeSubSounds, playMainSound, mainSound, subSoundTimers, subSounds, playSubSound, scheduleNextPlay]);
+  }, [activeMainSound, activeSubSounds, playMainSound, mainSound, subSoundTimers, subSounds, playSubSound]);
 
   // Update volume for active sub sounds
   useEffect(() => {
@@ -382,20 +566,25 @@ export default function RelaxScreen() {
     };
   }, [subSounds]);
 
+  const updateVolume = useCallback((soundId: string, value: number) => {
+    setVolumes(prev => ({ ...prev, [soundId]: value }));
+  }, []);
+
   return (
     <LinearGradient
-      colors={['#121212', '#121212']}
+      colors={[colors.background[0], colors.background[1]]}
       style={styles.container}
     >
       <ScrollView style={styles.content}>
-        <Text style={styles.sectionTitle}>Ana Sesler</Text>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Ana Sesler</Text>
         <View style={styles.mainSounds}>
           {MAIN_SOUNDS.map((sound) => (
             <TouchableOpacity
               key={sound.id}
               style={[
                 styles.soundButton,
-                activeMainSound === sound.id && { backgroundColor: sound.color }
+                { backgroundColor: colors.cardBackground },
+                activeMainSound === sound.id && { backgroundColor: colors.primary }
               ]}
               onPress={() => {
                 if (activeMainSound === sound.id) {
@@ -407,29 +596,40 @@ export default function RelaxScreen() {
             >
               <sound.icon
                 size={24}
-                color={activeMainSound === sound.id ? '#fff' : '#fff'}
+                color={activeMainSound === sound.id ? colors.text : colors.text}
               />
-              <Text style={styles.soundText}>{sound.title}</Text>
+              <Text style={[
+                styles.soundText,
+                { color: activeMainSound === sound.id ? colors.text : colors.text }
+              ]}>
+                {sound.title}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
 
-        <Text style={styles.sectionTitle}>Alt Sesler</Text>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Alt Sesler</Text>
         <View style={styles.subSounds}>
           {SUB_SOUNDS.map((sound) => (
             <TouchableOpacity
               key={sound.id}
               style={[
                 styles.soundButton,
-                activeSubSounds.has(sound.id) && { backgroundColor: sound.color }
+                { backgroundColor: colors.cardBackground },
+                activeSubSounds.has(sound.id) && { backgroundColor: colors.primary }
               ]}
               onPress={() => toggleSubSound(sound)}
             >
               <sound.icon
                 size={24}
-                color={activeSubSounds.has(sound.id) ? '#fff' : '#fff'}
+                color={activeSubSounds.has(sound.id) ? colors.text : colors.text}
               />
-              <Text style={styles.soundText}>{sound.title}</Text>
+              <Text style={[
+                styles.soundText,
+                { color: activeSubSounds.has(sound.id) ? colors.text : colors.text }
+              ]}>
+                {sound.title}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -439,46 +639,49 @@ export default function RelaxScreen() {
         <>
           <TouchableOpacity
             onPress={() => setIsModalVisible(true)}
-            style={styles.playbackBar}
+            style={[styles.floatingPlaybar, { backgroundColor: colors.cardBackground }]}
           >
-            <View style={styles.playbackInfo}>
-              <Text style={styles.playbackTitle}>
-                {MAIN_SOUNDS.find(s => s.id === activeMainSound)?.title}
-              </Text>
-              <Text style={styles.playbackSubtitle}>
-                {activeSubSounds.size} alt ses aktif
-              </Text>
-            </View>
-            <View style={styles.playbackControls}>
-              <TouchableOpacity
-                style={styles.playbackButton}
-                onPress={(e) => {
-                  e.stopPropagation();
-                  toggleMainSound();
-                }}
-              >
-                {isMainSoundPlaying ? (
-                  <Pause size={24} color="#fff" />
-                ) : (
-                  <Play size={24} color="#fff" />
-                )}
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.playbackButton, styles.stopButton]}
-                onPress={(e) => {
-                  e.stopPropagation();
-                  resetAllSounds();
-                }}
-              >
-                <X size={24} color="#fff" />
-              </TouchableOpacity>
+            <View style={styles.playbarContent}>
+              <View style={styles.playbarLeft}>
+                <View style={[styles.coverImage, { backgroundColor: colors.primary }]}>
+                  {isMainSoundPlaying ? (
+                    <Pause size={24} color={colors.text} />
+                  ) : (
+                    <Play size={24} color={colors.text} />
+                  )}
+                </View>
+                <View style={styles.playbarInfo}>
+                  <Text style={[styles.playbarTitle, { color: colors.text }]}>
+                    {MAIN_SOUNDS.find(s => s.id === activeMainSound)?.title}
+                  </Text>
+                  <Text style={[styles.playbarSubtitle, { color: colors.subText }]}>
+                    {activeSubSounds.size} alt ses aktif
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.playbarRight}>
+                <TouchableOpacity
+                  onPress={() => setIsModalVisible(true)}
+                  style={[styles.iconButton, { backgroundColor: colors.cardBackground }]}
+                >
+                  <ChevronUp size={24} color={colors.text} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => resetAllSounds()}
+                  style={[styles.iconButton, { backgroundColor: colors.cardBackground }]}
+                >
+                  <X size={24} color={colors.text} />
+                </TouchableOpacity>
+              </View>
             </View>
           </TouchableOpacity>
 
           <Modal
             visible={isModalVisible}
+            transparent={true}
             animationType="slide"
             presentationStyle="fullScreen"
+            onRequestClose={() => setIsModalVisible(false)}
           >
             <ImageBackground
               source={require('../../assets/images/forest.jpg')}
@@ -489,64 +692,67 @@ export default function RelaxScreen() {
                 style={styles.modalContent}
               >
                 <TouchableOpacity
-                  style={styles.closeModalButton}
                   onPress={() => setIsModalVisible(false)}
+                  style={[styles.closeButton, { backgroundColor: colors.cardBackground }]}
                 >
-                  <ChevronDown size={24} color="#fff" />
+                  <ChevronDown size={24} color={colors.text} />
                 </TouchableOpacity>
 
                 <View style={styles.modalPlaybackInfo}>
-                  <Text style={styles.modalTitle}>
+                  <Text style={[styles.modalTitle, { color: colors.text }]}>
                     {MAIN_SOUNDS.find(s => s.id === activeMainSound)?.title}
                   </Text>
-                  <Text style={styles.modalSubtitle}>
+                  <Text style={[styles.modalSubtitle, { color: colors.subText }]}>
                     {activeSubSounds.size} alt ses aktif
                   </Text>
 
                   <View style={styles.volumeControls}>
                     <View style={styles.volumeSection}>
-                      <Text style={styles.volumeTitle}>Ana Ses</Text>
+                      <Text style={[styles.volumeTitle, { color: colors.text }]}>Ana Ses</Text>
                       <View style={styles.volumeSlider}>
-                        <Volume2 size={20} color="#fff" />
+                        <Volume2 size={20} color={colors.text} />
                         <Slider
                           style={{ flex: 1, marginLeft: 10 }}
                           minimumValue={0}
                           maximumValue={1}
                           value={volumes[activeMainSound || ''] || 0.5}
-                          onValueChange={async (value: number) => {
+                          onValueChange={async (value) => {
                             if (mainSound) {
                               await mainSound.setVolumeAsync(value);
                               setVolumes(prev => ({ ...prev, [activeMainSound || '']: value }));
                             }
                           }}
-                          minimumTrackTintColor="#fff"
-                          maximumTrackTintColor="rgba(255,255,255,0.3)"
-                          thumbTintColor="#fff"
+                          minimumTrackTintColor={colors.primary}
+                          maximumTrackTintColor={colors.border}
+                          thumbTintColor={colors.primary}
                         />
                       </View>
                     </View>
 
                     {activeSubSounds.size > 0 && (
                       <View style={styles.volumeSection}>
-                        <Text style={styles.volumeTitle}>Alt Sesler</Text>
+                        <Text style={[styles.volumeTitle, { color: colors.text }]}>Alt Sesler</Text>
                         {Array.from(activeSubSounds).map(soundId => {
                           const sound = SUB_SOUNDS.find(s => s.id === soundId);
                           if (!sound) return null;
 
                           return (
                             <View key={sound.id} style={styles.volumeSlider}>
-                              <sound.icon size={20} color="#fff" />
+                              <sound.icon size={20} color={colors.text} />
                               <Slider
                                 style={{ flex: 1, marginLeft: 10 }}
                                 minimumValue={0}
                                 maximumValue={1}
                                 value={volumes[sound.id] || 0.3}
-                                onValueChange={(value: number) => {
-                                  setVolumes(prev => ({ ...prev, [sound.id]: value }));
+                                onValueChange={async (value) => {
+                                  if (subSounds[sound.id]) {
+                                    await subSounds[sound.id].setVolumeAsync(value);
+                                    setVolumes(prev => ({ ...prev, [sound.id]: value }));
+                                  }
                                 }}
-                                minimumTrackTintColor="#fff"
-                                maximumTrackTintColor="rgba(255,255,255,0.3)"
-                                thumbTintColor="#fff"
+                                minimumTrackTintColor={colors.primary}
+                                maximumTrackTintColor={colors.border}
+                                thumbTintColor={colors.primary}
                               />
                             </View>
                           );
@@ -557,20 +763,20 @@ export default function RelaxScreen() {
 
                   <View style={styles.modalControls}>
                     <TouchableOpacity
-                      style={styles.modalPlaybackButton}
+                      style={[styles.modalPlaybackButton, { backgroundColor: colors.primary }]}
                       onPress={toggleMainSound}
                     >
                       {isMainSoundPlaying ? (
-                        <Pause size={32} color="#fff" />
+                        <Pause size={32} color={colors.text} />
                       ) : (
-                        <Play size={32} color="#fff" />
+                        <Play size={32} color={colors.text} />
                       )}
                     </TouchableOpacity>
                     <TouchableOpacity
-                      style={[styles.modalPlaybackButton, styles.modalStopButton]}
+                      style={[styles.modalPlaybackButton, styles.modalStopButton, { backgroundColor: colors.secondary }]}
                       onPress={resetAllSounds}
                     >
-                      <X size={32} color="#fff" />
+                      <X size={32} color={colors.text} />
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -582,164 +788,3 @@ export default function RelaxScreen() {
     </LinearGradient>
   );
 }
-
-const { width } = Dimensions.get('window');
-const buttonSize = (width - 40 - 20) / 3;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    padding: 20,
-    paddingBottom: 80, // Add padding for playback bar
-  },
-  sectionTitle: {
-    color: '#fff',
-    fontSize: 18,
-    fontFamily: 'Inter-SemiBold',
-    marginBottom: 15,
-    marginTop: 20,
-  },
-  mainSounds: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-    marginBottom: 20,
-  },
-  subSounds: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-  },
-  soundButton: {
-    width: buttonSize,
-    height: buttonSize,
-    backgroundColor: 'rgba(42, 42, 42, 0.8)',
-    borderRadius: buttonSize / 2,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  soundText: {
-    color: '#fff',
-    marginTop: 8,
-    fontSize: 12,
-    fontFamily: 'Inter-Regular',
-  },
-  playbackBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 70,
-    backgroundColor: 'rgba(18, 18, 18, 0.95)',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  playbackInfo: {
-    flex: 1,
-  },
-  playbackControls: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  playbackButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  stopButton: {
-    backgroundColor: 'rgba(244, 67, 54, 0.1)',
-  },
-  playbackTitle: {
-    color: '#fff',
-    fontSize: 16,
-    fontFamily: 'Inter-SemiBold',
-  },
-  playbackSubtitle: {
-    color: 'rgba(255, 255, 255, 0.6)',
-    fontSize: 12,
-    fontFamily: 'Inter-Regular',
-    marginTop: 4,
-  },
-  modalBackground: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-  },
-  modalContent: {
-    flex: 1,
-    padding: 20,
-  },
-  closeModalButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 40,
-  },
-  modalPlaybackInfo: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    paddingBottom: 100,
-  },
-  modalTitle: {
-    color: '#fff',
-    fontSize: 32,
-    fontFamily: 'Inter-SemiBold',
-    textAlign: 'center',
-  },
-  modalSubtitle: {
-    color: 'rgba(255, 255, 255, 0.8)',
-    fontSize: 16,
-    fontFamily: 'Inter-Regular',
-    marginTop: 8,
-    textAlign: 'center',
-  },
-  modalControls: {
-    flexDirection: 'row',
-    gap: 20,
-    marginTop: 40,
-  },
-  modalPlaybackButton: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalStopButton: {
-    backgroundColor: 'rgba(244, 67, 54, 0.2)',
-  },
-  volumeControls: {
-    width: '100%',
-    marginTop: 40,
-    marginBottom: 40,
-  },
-  volumeSection: {
-    marginBottom: 20,
-  },
-  volumeTitle: {
-    color: '#fff',
-    fontSize: 16,
-    fontFamily: 'Inter-SemiBold',
-    marginBottom: 15,
-  },
-  volumeSlider: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-    paddingHorizontal: 10,
-  },
-});

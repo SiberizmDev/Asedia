@@ -1,9 +1,9 @@
-import { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ImageBackground, Modal, Dimensions, PanResponder, Animated, Platform, SafeAreaView } from 'react-native';
 import { Audio } from 'expo-av';
-import { Cloud, Moon, Wind, Star, Music2, BedDouble, Clock, ArrowLeft, Leaf, Tent, Play, Pause, X } from 'lucide-react-native';
+import { Cloud, Moon, Wind, Star, Music2, BedDouble, Clock, ArrowLeft, Leaf, Tent, Play, Pause, X, Timer } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useFonts, Inter_400Regular, Inter_600SemiBold } from '@expo-google-fonts/inter';
+import { useFonts, Inter_400Regular, Inter_600SemiBold, Inter_500Medium } from '@expo-google-fonts/inter';
 import { BlurView } from 'expo-blur';
 
 const SOUND_URLS = {
@@ -151,11 +151,77 @@ export default function SleepScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [nextSound, setNextSound] = useState<Sound | null>(null);
   const [activeSound, setActiveSound] = useState<Sound | null>(null);
-  
+  const [activeTimer, setActiveTimer] = useState<number | null>(null);
+  const [remainingTime, setRemainingTime] = useState<number | null>(null);
+  const [timerInterval, setTimerInterval] = useState<NodeJS.Timeout | null>(null);
+
   const translateY = useRef(new Animated.Value(0)).current;
-  
+
   // Create a flat array of all sounds
   const allSounds = useRef(CATEGORIES.flatMap(category => category.sounds)).current;
+
+  // Timer options in seconds
+  const timerOptions = [
+    { label: '5 dk', value: 5 * 60 }, // 5 minutes = 5 * 60 seconds
+    { label: '10 dk', value: 10 * 60 }, // 10 minutes = 10 * 60 seconds
+    { label: '15 dk', value: 15 * 60 }, // 15 minutes = 15 * 60 seconds
+  ] as const;
+
+  type TimerOption = typeof timerOptions[number];
+
+  const formatTime = useCallback((seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  }, []);
+
+  const resetAllSounds = useCallback(async () => {
+    if (currentSound) {
+      await currentSound.stopAsync();
+      await currentSound.unloadAsync();
+    }
+    setActiveSound(null);
+    setCurrentSound(null);
+    setIsPlaying(false);
+    setSelectedSound(null);
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      setTimerInterval(null);
+    }
+    setActiveTimer(null);
+    setRemainingTime(null);
+  }, [currentSound, timerInterval]);
+
+  const startTimer = useCallback((seconds: number) => {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+    }
+
+    setActiveTimer(seconds);
+    setRemainingTime(seconds);
+
+    const interval = setInterval(() => {
+      setRemainingTime(prev => {
+        if (prev === null || prev <= 1) {
+          clearInterval(interval);
+          resetAllSounds();
+          return null;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    setTimerInterval(interval);
+  }, [timerInterval, resetAllSounds]);
+
+  const cancelTimer = useCallback(() => {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+    }
+    setActiveTimer(null);
+    setRemainingTime(null);
+    setTimerInterval(null);
+  }, [timerInterval]);
 
   const handleSoundChange = async (newSound: Sound) => {
     try {
@@ -170,7 +236,7 @@ export default function SleepScreen() {
       await soundObject.loadAsync(SOUND_URLS[newSound.id]);
       await soundObject.setIsLoopingAsync(true);
       await soundObject.playAsync();
-      
+
       // Update states
       setCurrentSound(soundObject);
       setSelectedSound(newSound);
@@ -190,10 +256,10 @@ export default function SleepScreen() {
       },
       onPanResponderRelease: (_, gesture) => {
         const SWIPE_THRESHOLD = 100;
-        
+
         if (Math.abs(gesture.dy) > SWIPE_THRESHOLD && selectedSound) {
           const currentIndex = allSounds.findIndex(s => s.id === selectedSound.id);
-          
+
           if (currentIndex !== -1) {
             let nextIndex;
             if (gesture.dy > 0) { // Swipe down - previous
@@ -203,7 +269,7 @@ export default function SleepScreen() {
             }
 
             const newSound = allSounds[nextIndex];
-            
+
             // Animate out current content
             Animated.timing(translateY, {
               toValue: gesture.dy > 0 ? height : -height,
@@ -212,7 +278,7 @@ export default function SleepScreen() {
             }).start(async () => {
               // Change sound immediately
               await handleSoundChange(newSound);
-              
+
               // Reset position and animate in new content
               translateY.setValue(gesture.dy > 0 ? -height : height);
               Animated.spring(translateY, {
@@ -239,6 +305,7 @@ export default function SleepScreen() {
   const [fontsLoaded] = useFonts({
     'Inter-Regular': Inter_400Regular,
     'Inter-SemiBold': Inter_600SemiBold,
+    'Inter-Medium': Inter_500Medium,
   });
 
   useEffect(() => {
@@ -246,8 +313,11 @@ export default function SleepScreen() {
       Object.values(sounds).forEach(async (sound) => {
         await sound?.unloadAsync();
       });
+      if (timerInterval) {
+        clearInterval(timerInterval);
+      }
     };
-  }, []);
+  }, [sounds, timerInterval]);
 
   useEffect(() => {
     Audio.setAudioModeAsync({
@@ -275,7 +345,7 @@ export default function SleepScreen() {
       await soundObject.loadAsync(SOUND_URLS[sound.id]);
       await soundObject.setIsLoopingAsync(true);
       await soundObject.playAsync();
-      
+
       setCurrentSound(soundObject);
       setSelectedSound(sound);
       setActiveSound(sound);
@@ -289,7 +359,7 @@ export default function SleepScreen() {
           isActive: s.id === sound.id
         }))
       }));
-      
+
       // You might want to update your state with updatedCategories here
     } catch (error) {
       console.error('Error playing sound:', error);
@@ -298,7 +368,7 @@ export default function SleepScreen() {
 
   const togglePlayback = async () => {
     if (!currentSound) return;
-    
+
     try {
       if (isPlaying) {
         await currentSound.pauseAsync();
@@ -320,7 +390,7 @@ export default function SleepScreen() {
       >
         <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.7)' }]} />
       </ImageBackground>
-      
+
       <ScrollView style={styles.content}>
         {CATEGORIES.map((category, index) => (
           <View key={index} style={styles.categorySection}>
@@ -398,6 +468,26 @@ export default function SleepScreen() {
               </BlurView>
             </ImageBackground>
             <View style={styles.controlsContent}>
+
+              <TouchableOpacity
+                style={styles.playbarControl}
+                onPress={() => {
+                  if (!remainingTime) {
+                    startTimer(300); // Default to 5 minutes (300 seconds)
+                  } else {
+                    cancelTimer();
+                  }
+                }}
+              >
+                <Timer size={24} color="#fff" />
+                {remainingTime && (
+                  <View style={styles.timerBadge}>
+                    <Text style={styles.timerBadgeText}>{formatTime(remainingTime)}</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+
+
               <TouchableOpacity
                 style={styles.playbarControl}
                 onPress={togglePlayback}
@@ -408,6 +498,8 @@ export default function SleepScreen() {
                   <Play size={24} color="#fff" />
                 )}
               </TouchableOpacity>
+
+
               <TouchableOpacity
                 style={styles.playbarControl}
                 onPress={() => {
@@ -418,6 +510,7 @@ export default function SleepScreen() {
                   setActiveSound(null);
                   setCurrentSound(null);
                   setIsPlaying(false);
+                  cancelTimer();
                 }}
               >
                 <X size={24} color="#fff" />
@@ -435,7 +528,7 @@ export default function SleepScreen() {
                 <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.3)' }]} />
               </BlurView>
             </ImageBackground>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.playbarContent}
               onPress={() => setSelectedSound(activeSound)}
             >
@@ -458,9 +551,7 @@ export default function SleepScreen() {
         animationType="slide"
         transparent={false}
         presentationStyle="fullScreen"
-        onRequestClose={() => {
-          setSelectedSound(null);
-        }}
+        onRequestClose={() => setSelectedSound(null)}
       >
         {selectedSound && (
           <View style={styles.modalContainer}>
@@ -483,7 +574,7 @@ export default function SleepScreen() {
                 <View style={styles.modalInfo}>
                   <Text style={styles.modalTitle}>{selectedSound.title}</Text>
                   <Text style={styles.modalDescription}>{selectedSound.description}</Text>
-                  
+
                   <View style={styles.playbackControls}>
                     <TouchableOpacity
                       style={styles.playPauseButton}
@@ -495,6 +586,51 @@ export default function SleepScreen() {
                         <Play size={32} color="#fff" />
                       )}
                     </TouchableOpacity>
+                  </View>
+
+                  <View style={styles.timerSection}>
+                    <Text style={styles.timerTitle}>
+                      {remainingTime ? 'Kalan Süre' : 'Zamanlayıcı'}
+                    </Text>
+
+                    {!remainingTime ? (
+                      <View style={styles.timerOptions}>
+                        {timerOptions.map((option) => (
+                          <TouchableOpacity
+                            key={option.value}
+                            style={[
+                              styles.timerButton,
+                              {
+                                backgroundColor: activeTimer === option.value ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
+                                borderColor: activeTimer === option.value ? '#fff' : 'rgba(255, 255, 255, 0.5)',
+                              },
+                            ]}
+                            onPress={() => startTimer(option.value)}
+                          >
+                            <Text
+                              style={[
+                                styles.timerButtonText,
+                                { color: activeTimer === option.value ? '#fff' : 'rgba(255, 255, 255, 0.7)' },
+                              ]}
+                            >
+                              {option.label}
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    ) : (
+                      <View style={styles.timerDisplay}>
+                        <Text style={styles.timerCountdown}>
+                          {formatTime(remainingTime)}
+                        </Text>
+                        <TouchableOpacity
+                          style={styles.timerCancel}
+                          onPress={cancelTimer}
+                        >
+                          <Text style={styles.timerCancelText}>İptal Et</Text>
+                        </TouchableOpacity>
+                      </View>
+                    )}
                   </View>
                 </View>
               </LinearGradient>
@@ -649,7 +785,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 100,
     alignSelf: 'center',
-    width: 112,
+    width: 170,
     height: 56,
     borderRadius: 50,
     overflow: 'hidden',
@@ -666,7 +802,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    gap: 12,
     height: '100%',
   },
   floatingPlaybar: {
@@ -716,5 +852,69 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.1)',
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'relative',
+  },
+  timerSection: {
+    alignItems: 'center',
+    marginTop: 30,
+  },
+  timerTitle: {
+    color: '#fff',
+    fontSize: 24,
+    fontFamily: 'Inter-SemiBold',
+  },
+  timerOptions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginTop: 10,
+  },
+  timerButton: {
+    width: 80,
+    height: 40,
+    borderWidth: 2,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  timerButtonText: {
+    fontSize: 14,
+    fontFamily: 'Inter-Regular',
+  },
+  timerDisplay: {
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  timerCountdown: {
+    color: '#fff',
+    fontSize: 48,
+    fontFamily: 'Inter-SemiBold',
+  },
+  timerCancel: {
+    marginTop: 10,
+    padding: 8,
+    borderRadius: 16,
+  },
+  timerCancelText: {
+    color: '#FF5252',
+    fontSize: 14,
+    fontFamily: 'Inter-Regular',
+  },
+  timerBadge: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    backgroundColor: '#FF5252',
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+  },
+  timerBadgeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontFamily: 'Inter-Regular',
   },
 });

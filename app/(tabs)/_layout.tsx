@@ -1,23 +1,28 @@
 import { Tabs } from 'expo-router';
 import { Moon, Heart, Settings, TreeDeciduousIcon } from 'lucide-react-native';
+import { useTheme } from '../context/ThemeContext';
 
 export default function TabLayout() {
+  const { colors } = useTheme();
+
   return (
     <Tabs
       screenOptions={{
-        headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#101013',
-          borderTopWidth: 0,
+          backgroundColor: colors.background[0],
+          borderTopColor: colors.border,
+          borderTopWidth: 1,
         },
-        tabBarActiveTintColor: '#fff',
-        tabBarInactiveTintColor: '#666',
-      }}>
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.subText,
+        headerShown: false,
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
           title: 'Atmosfer',
-          tabBarIcon: ({ size, color }) => (
+          tabBarIcon: ({ color, size }: { color: string; size: number }) => (
             <TreeDeciduousIcon size={size} color={color} />
           ),
         }}
@@ -26,7 +31,7 @@ export default function TabLayout() {
         name="relax"
         options={{
           title: 'Rahatlama',
-          tabBarIcon: ({ size, color }) => (
+          tabBarIcon: ({ color, size }: { color: string; size: number }) => (
             <Heart size={size} color={color} />
           ),
         }}
@@ -35,7 +40,7 @@ export default function TabLayout() {
         name="settings"
         options={{
           title: 'Ayarlar',
-          tabBarIcon: ({ size, color }) => (
+          tabBarIcon: ({ color, size }: { color: string; size: number }) => (
             <Settings size={size} color={color} />
           ),
         }}
