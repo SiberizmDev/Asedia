@@ -1,6 +1,8 @@
-import { View, Text, StyleSheet, TouchableOpacity, Switch, Linking, ActivityIndicator, ScrollView, ImageBackground, SafeAreaView, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Switch, Linking, ActivityIndicator, ScrollView, Image, ImageBackground, SafeAreaView, StatusBar } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Bell, Moon, Volume2, Clock, ChevronRight, Download, RefreshCw, Sun, Smartphone } from 'lucide-react-native';
+import Icon from 'react-native-vector-icons/FontAwesome'; // FontAwesome ikonları kullanılacak
+
 import { useState, useEffect } from 'react';
 import Constants from 'expo-constants';
 import { useTheme } from '../context/ThemeContext';
@@ -18,8 +20,12 @@ export default function SettingsScreen() {
   const [latestVersion, setLatestVersion] = useState('');
   const [isChecking, setIsChecking] = useState(false);
   const currentVersion = Constants.expoConfig?.version || '0.1.0';
-  
+
   const { theme, setTheme, colors } = useTheme();
+
+  const handlePress = (url) => {
+    Linking.openURL(url).catch((err) => console.error("Bağlantı yüklenemedi:", err));
+  };
 
   useEffect(() => {
     checkForUpdates();
@@ -45,11 +51,11 @@ export default function SettingsScreen() {
       console.log('GitHub version:', data.expo.version);
       const githubVersion = data.expo.version;
       setLatestVersion(githubVersion);
-      
+
       if (githubVersion > currentVersion) {
         console.log('Update available!');
         setUpdateAvailable(true);
-        
+
         // Yeni güncelleme varsa ve bildirimler açıksa bildirim gönder
         if (notifications) {
           await Notifications.scheduleNotificationAsync({
@@ -138,10 +144,10 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme === 'light' ? '#FFFFFF' : colors.background[0] }]}>
-      <StatusBar 
-        barStyle={theme === 'light' ? 'dark-content' : 'light-content'} 
-        backgroundColor={theme === 'light' ? '#FFFFFF' : theme === 'amoled' ? '#000000' : '#121212'} 
-        translucent 
+      <StatusBar
+        barStyle={theme === 'light' ? 'dark-content' : 'light-content'}
+        backgroundColor={theme === 'light' ? '#FFFFFF' : theme === 'amoled' ? '#000000' : '#121212'}
+        translucent
       />
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <Text style={[styles.title, { color: colors.text }]}>Ayarlar</Text>
@@ -161,8 +167,8 @@ export default function SettingsScreen() {
 
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Görünüm ve Ses</Text>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={[styles.settingItem, { borderBottomColor: colors.border }]}
             onPress={() => router.push('/screens/theme')}
           >
@@ -173,8 +179,8 @@ export default function SettingsScreen() {
                   Tema
                 </Text>
                 <Text style={[styles.settingSubText, { color: colors.subText }]}>
-                  {theme === 'amoled' ? 'AMOLED Karanlık' : 
-                   theme === 'dark' ? 'Karanlık Mod' : 'Aydınlık Mod'}
+                  {theme === 'amoled' ? 'AMOLED Karanlık' :
+                    theme === 'dark' ? 'Karanlık Mod' : 'Aydınlık Mod'}
                 </Text>
               </View>
             </View>
@@ -217,7 +223,7 @@ export default function SettingsScreen() {
             />
           </View>
 
-          <TouchableOpacity style={[styles.settingItem, { borderBottomColor: colors.border }]}>
+          {/* <TouchableOpacity style={[styles.settingItem, { borderBottomColor: colors.border }]}>
             <View style={styles.settingLeft}>
               <Clock size={24} color={colors.text} />
               <View style={styles.settingTextContainer}>
@@ -228,13 +234,54 @@ export default function SettingsScreen() {
               </View>
             </View>
             <ChevronRight size={24} color={colors.text} />
+          </TouchableOpacity> */}
+        </View>
+
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Bize Ulaşın</Text>
+
+          <TouchableOpacity
+            style={[styles.settingItem, { borderBottomColor: colors.border }]}
+            onPress={() => handlePress('https://forum.asena.space/')}
+          >
+            <View style={styles.settingLeft}>
+              {/* Icon image */}
+              <Image
+                source={require('../../assets/images/forum.png')} // resmin doğru yolunu belirtin
+                style={{ width: 24, height: 24, marginRight: 10 }} // İkon boyutu
+              />
+              <View style={styles.settingTextContainer}>
+                <Text style={[styles.settingText, { color: colors.text }]}>Asena Forum</Text>
+              </View>
+            </View>
+            <ChevronRight size={24} color={colors.text} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.settingItem, { borderBottomColor: colors.border }]}
+            onPress={() => handlePress('https://www.instagram.com/asena.space/')} // Instagram profil linkini buraya ekleyin
+          >
+            <View style={styles.settingLeft}>
+              {/* Instagram İkonu */}
+              <Icon
+                name="instagram" // FontAwesome'dan Instagram ikonu
+                size={24} // İkon boyutu
+                color={colors.text} // İkon rengi
+                style={{ marginRight: 10 }} // Sağ boşluk
+              />
+              <View style={styles.settingTextContainer}>
+                <Text style={[styles.settingText, { color: colors.text }]}>@asena.space</Text>
+              </View>
+            </View>
+            <ChevronRight size={24} color={colors.text} />
           </TouchableOpacity>
         </View>
 
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Hakkında</Text>
-          
-          <TouchableOpacity style={[styles.settingItem, { borderBottomColor: colors.border }]}>
+
+          <TouchableOpacity style={[styles.settingItem, { borderBottomColor: colors.border }]}
+            onPress={() => handlePress('https://apps.asena.space/Asedia/privacy.html')}>
             <View style={styles.settingLeft}>
               <View style={styles.settingTextContainer}>
                 <Text style={[styles.settingText, { color: colors.text }]}>Gizlilik Politikası</Text>
@@ -243,7 +290,8 @@ export default function SettingsScreen() {
             <ChevronRight size={24} color={colors.text} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.settingItem, { borderBottomColor: colors.border }]}>
+          <TouchableOpacity style={[styles.settingItem, { borderBottomColor: colors.border }]}
+            onPress={() => handlePress('https://apps.asena.space/Asedia/terms.html')}>
             <View style={styles.settingLeft}>
               <View style={styles.settingTextContainer}>
                 <Text style={[styles.settingText, { color: colors.text }]}>Kullanım Koşulları</Text>
@@ -252,8 +300,8 @@ export default function SettingsScreen() {
             <ChevronRight size={24} color={colors.text} />
           </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={[styles.settingItem, styles.updateCheck, { borderBottomColor: colors.border }]} 
+          <TouchableOpacity
+            style={[styles.settingItem, styles.updateCheck, { borderBottomColor: colors.border }]}
             onPress={checkForUpdates}
             disabled={isChecking}
           >
@@ -281,18 +329,18 @@ export default function SettingsScreen() {
           </View>
         </View>
 
-        {/* {notifications && (
+        {notifications && (
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Test Bildirimi</Text>
             <TouchableOpacity
               style={[styles.option, { backgroundColor: colors.cardBackground }]}
               onPress={handleTestNotification}
             >
-              <Text style={[styles.optionText, { color: colors.text }]}>Test Bildirimi Gönder</Text>
+              <Text style={[styles.optionText, { color: colors.text }]}>Cihaza Test Bildirimi Gönder</Text>
               <Bell size={20} color={colors.text} />
             </TouchableOpacity>
           </View>
-        )} */}
+        )}
       </ScrollView>
     </SafeAreaView>
   );

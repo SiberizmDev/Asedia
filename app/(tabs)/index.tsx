@@ -11,7 +11,7 @@ const SOUND_URLS = {
   grove: require('../../assets/sounds/grove.mp3'),
   night: require('../../assets/sounds/night-ambiance.mp3'),
   wind: require('../../assets/sounds/wind.mp3'),
-  stars: require('../../assets/sounds/stars.mp3'),
+  meditation: require('../../assets/sounds/meditation.mp3'),
   lullaby: require('../../assets/sounds/lullaby.mp3'),
   dream: require('../../assets/sounds/dream.mp3'),
   timer: require('../../assets/sounds/timer.mp3'),
@@ -180,30 +180,30 @@ const CATEGORIES: Category[] = [
     subtitle: "Seslerin dijital dünyasına dalın",
     sounds: [
       {
-        id: 'wind',
-        title: 'Beyaz gürültü',
-        description: 'Sabit frekanslı ses',
+        id: 'meditation',
+        title: 'Meditasyon',
+        description: 'Meditasyon frekanslı ses',
         icon: Wind,
         color: '#9E9E9E',
-        background: require('../../assets/images/forest.jpg'),
+        background: require('../../assets/images/meditation.jpg'),
         isActive: false
       },
       {
         id: 'lullaby',
-        title: 'Pembe gürültü',
+        title: 'Ninni',
         description: 'Yumuşak frekans sesi',
         icon: Wind,
         color: '#E91E63',
-        background: require('../../assets/images/forest.jpg'),
+        background: require('../../assets/images/lullaby.jpg'),
         isActive: false
       },
       {
         id: 'dream',
-        title: 'Gri gürültü',
+        title: 'Rüya',
         description: 'Derin frekans sesi',
         icon: Wind,
         color: '#795548',
-        background: require('../../assets/images/forest.jpg'),
+        background: require('../../assets/images/dream.jpg'),
         isActive: false
       },
     ]

@@ -21,7 +21,7 @@
     "android": {
       "package": "com.asena.space",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/icon.png",
+        "foregroundImage": "./assets/images/icon-nobg.png",
         "backgroundColor": "#101013"
       },
       "versionCode": 1,
