@@ -9,6 +9,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useRouter } from 'expo-router';
 import { registerForPushNotificationsAsync, sendTestNotification } from '../utils/notifications';
 import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
 
 const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/SiberizmDev/Asedia/main/app.json';
 
@@ -85,8 +86,73 @@ export default function SettingsScreen() {
 
   const handleNotificationToggle = async () => {
     if (!notifications) {
-      const token = await registerForPushNotificationsAsync();
-      setNotifications(!!token);
+      // Bildirimleri açmaya çalışalım
+      try {
+        // Önce izinleri kontrol edelim
+        const { status: existingStatus } = await Notifications.getPermissionsAsync();
+        let finalStatus = existingStatus;
+
+        // İzin yoksa isteyelim
+        if (existingStatus !== 'granted') {
+          Alert.alert(
+            "Bildirim İzni Gerekli",
+            "Bildirimleri alabilmek için izin vermeniz gerekiyor.",
+            [
+              {
+                text: "İptal",
+                style: "cancel"
+              },
+              {
+                text: "Ayarlara Git",
+                onPress: () => {
+                  // Kullanıcıyı cihaz ayarlarına yönlendir
+                  if (Platform.OS === 'ios') {
+                    Linking.openURL('app-settings:');
+                  } else {
+                    Linking.openSettings();
+                  }
+                }
+              }
+            ]
+          );
+          return;
+        }
+
+        // Push token alıp ayarlayalım
+        const token = await registerForPushNotificationsAsync();
+        if (token) {
+          setNotifications(true);
+          // Başarılı bildirim
+          Alert.alert("Başarılı", "Bildirimler başarıyla etkinleştirildi.");
+        } else {
+          Alert.alert("Hata", "Bildirimler etkinleştirilemedi. Lütfen daha sonra tekrar deneyin.");
+        }
+      } catch (error) {
+        console.error('Bildirim hatası:', error);
+        Alert.alert("Hata", "Bildirimler etkinleştirilemedi: " + error.message);
+      }
+    } else {
+      // Bildirimleri kapatmak için
+      Alert.alert(
+        "Bildirimleri Kapat",
+        "Bildirimleri kapatmak için cihaz ayarlarını kullanmanız gerekiyor.",
+        [
+          {
+            text: "İptal",
+            style: "cancel"
+          },
+          {
+            text: "Ayarlara Git",
+            onPress: () => {
+              if (Platform.OS === 'ios') {
+                Linking.openURL('app-settings:');
+              } else {
+                Linking.openSettings();
+              }
+            }
+          }
+        ]
+      );
     }
   };
 
@@ -330,19 +396,28 @@ export default function SettingsScreen() {
         </View>
 
         {notifications && (
-          <View style={styles.section}>
+          < View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Test Bildirimi</Text>
             <TouchableOpacity
-              style={[styles.option, { backgroundColor: colors.cardBackground }]}
-              onPress={handleTestNotification}
+              style={[
+                styles.option,
+                {
+                  backgroundColor: colors.cardBackground,
+                  opacity: notifications ? 1 : 0.5 // Bildirimler kapalıysa görsel geri bildirim
+                }
+              ]}
+              onPress={notifications ? handleTestNotification : handleNotificationToggle}
+              disabled={!notifications}
             >
-              <Text style={[styles.optionText, { color: colors.text }]}>Cihaza Test Bildirimi Gönder</Text>
+              <Text style={[styles.optionText, { color: colors.text }]}>
+                {notifications ? 'Cihaza Test Bildirimi Gönder' : 'Bildirim İzni Gerekli'}
+              </Text>
               <Bell size={20} color={colors.text} />
             </TouchableOpacity>
           </View>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </SafeAreaView >
   );
 }
 

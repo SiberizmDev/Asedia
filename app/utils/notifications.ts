@@ -1,6 +1,7 @@
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
+import Constants from 'expo-constants';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -11,45 +12,60 @@ Notifications.setNotificationHandler({
 });
 
 export async function registerForPushNotificationsAsync() {
-  let token;
+  // Fiziksel bir cihaz mı kontrol edelim (bildirimler simülatörlerde çalışmaz)
+  const deviceType = await Device.getDeviceTypeAsync();
+  if (deviceType !== Device.DeviceType.PHONE) {
+    console.log('Bildirimler için fiziksel cihaz gerekli');
+    return;
+  }
 
-  if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync('default', {
-      name: 'default',
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#FF231F7C',
+  // İzin durumunu kontrol edelim
+  const { status: existingStatus } = await Notifications.getPermissionsAsync();
+  let finalStatus = existingStatus;
+  
+  // Eğer izin henüz alınmamışsa isteyelim
+  if (existingStatus !== 'granted') {
+    const { status } = await Notifications.requestPermissionsAsync();
+    finalStatus = status;
+  }
+
+  // İzin yoksa çıkalım
+  if (finalStatus !== 'granted') {
+    console.log('Bildirim izni alınamadı!');
+    return;
+  }
+
+  try {
+    // Push token alalım
+    const expoPushToken = await Notifications.getExpoPushTokenAsync({
+      projectId: Constants.expoConfig.extra.eas.projectId, // ProjectId kullanımından emin ol
     });
+    console.log('Push token:', expoPushToken.data);
+    return expoPushToken.data;
+  } catch (error) {
+    console.error('Token alınırken hata:', error);
+    return null;
   }
-
-  if (Device.isDevice) {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-    if (existingStatus !== 'granted') {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
-    if (finalStatus !== 'granted') {
-      alert('Bildirim izni olmadan güncellemelerden haberdar olamazsınız!');
-      return;
-    }
-    token = (await Notifications.getExpoPushTokenAsync({
-      projectId: '73b063a3-1c70-4291-9653-2a51150c88e5'
-    })).data;
-  } else {
-    alert('Fiziksel bir cihaz kullanmalısınız!');
-  }
-
-  return token;
 }
 
 export async function sendTestNotification() {
+  // Önce izin kontrolü yapalım
+  const { status } = await Notifications.getPermissionsAsync();
+  if (status !== 'granted') {
+    console.log('Bildirim izni yok');
+    return;
+  }
+
+  // Hemen görüntülenecek bir bildirim planlayalım
   await Notifications.scheduleNotificationAsync({
     content: {
-      title: "Yeni Güncelleme! 🎉",
-      body: "Asedia uygulaması güncellendi! Hemen göz at.",
-      data: { data: 'goes here' },
+      title: "Test Bildirimi 🔔",
+      body: "Bildirimler başarıyla çalışıyor!",
+      sound: true, // Ses etkinleştir
+      priority: Notifications.AndroidNotificationPriority.HIGH,
     },
-    trigger: null,
+    trigger: null, // Hemen gönder
   });
-} 
+  
+  console.log('Test bildirimi gönderildi!');
+}

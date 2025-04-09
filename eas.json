@@ -12,9 +12,7 @@
       "android": {
         "buildType": "apk",
         "gradleCommand": ":app:assembleRelease",
-        "env": {
-          "ANDROID_NDK_HOME": "/opt/android-sdk/ndk/26.1.10909125"
-        }
+        "withoutCredentials": true
       },
       "env": {
         "EXPO_PUBLIC_API_URL": "https://expo.dev"

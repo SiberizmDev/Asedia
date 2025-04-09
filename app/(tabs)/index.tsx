@@ -15,6 +15,7 @@ const SOUND_URLS = {
   lullaby: require('../../assets/sounds/lullaby.mp3'),
   dream: require('../../assets/sounds/dream.mp3'),
   timer: require('../../assets/sounds/timer.mp3'),
+  timer2: require('../../assets/sounds/timer-2.mp3'),
   memory: require('../../assets/sounds/memory.mp3'),
   calm: require('../../assets/sounds/bamboo.mp3'),
   nightsea: require('../../assets/sounds/sea.mp3'),
@@ -24,7 +25,9 @@ const SOUND_URLS = {
   campfire3: require('../../assets/sounds/campfire-3.mp3'),
   winter: require('../../assets/sounds/winter.mp3'),
   hope: require('../../assets/sounds/hope.mp3'),
-  clouds: require('../../assets/sounds/clouds.mp3')
+  clouds: require('../../assets/sounds/clouds.mp3'),
+  envcafe: require('../../assets/sounds/envcafe.mp3'),
+  envlib: require('../../assets/sounds/envlib.mp3')
 } as const;
 
 type SoundId = keyof typeof SOUND_URLS;
@@ -173,6 +176,48 @@ const CATEGORIES: Category[] = [
       //   background: require('../../assets/images/night.jpg'),
       //   isActive: false
       // },
+    ]
+  },
+  {
+    title: "Odaklan",
+    subtitle: "Odaklanmanıza yardımcı olacak sesler",
+    sounds: [
+      {
+        id: 'timer',
+        title: 'Saat Tıkırtısı',
+        description: 'Geçen sürenin farkına varın',
+        icon: Wind,
+        color: '#9E9E9E',
+        background: require('../../assets/images/clock.jpg'),
+        isActive: false
+      },
+      {
+        id: 'timer2',
+        title: 'Saat Tıkırtısı 2',
+        description: 'Geçen sürenin farkına varın',
+        icon: Wind,
+        color: '#E91E63',
+        background: require('../../assets/images/clock2.jpg'),
+        isActive: false
+      },
+      {
+        id: 'envcafe',
+        title: 'Ortam (Kafe)',
+        description: 'Kafe ortamında çalışın',
+        icon: Wind,
+        color: '#795548',
+        background: require('../../assets/images/cafe.jpg'),
+        isActive: false
+      },
+      {
+        id: 'envlib',
+        title: 'Ortam (Kütüphane)',
+        description: 'Kütüphane ortamında çalışın',
+        icon: Wind,
+        color: '#795548',
+        background: require('../../assets/images/library.jpg'),
+        isActive: false
+      },
     ]
   },
   {
