@@ -501,7 +501,7 @@ export default function SleepScreen() {
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <View style={styles.container}>
         <ImageBackground
-          source={activeSound?.background || require('../../assets/images/forest.jpg')}
+          source={activeSound?.background || require('../../assets/images/night.jpg')}
           style={StyleSheet.absoluteFill}
           blurRadius={80}
         >

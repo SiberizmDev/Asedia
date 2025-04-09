@@ -36,9 +36,15 @@ export async function registerForPushNotificationsAsync() {
   }
 
   try {
+    // Project ID kontrolü ekleyelim
+    if (!Constants.expoConfig || !Constants.expoConfig.extra || !Constants.expoConfig.extra.eas) {
+      console.error('Project ID bulunamadı!');
+      return null;
+    }
+
     // Push token alalım
     const expoPushToken = await Notifications.getExpoPushTokenAsync({
-      projectId: Constants.expoConfig.extra.eas.projectId, // ProjectId kullanımından emin ol
+      projectId: Constants.expoConfig.extra.eas.projectId,
     });
     console.log('Push token:', expoPushToken.data);
     return expoPushToken.data;
@@ -56,6 +62,11 @@ export async function sendTestNotification() {
     return;
   }
 
+  if (!Constants.expoConfig || !Constants.expoConfig.extra || !Constants.expoConfig.extra.eas) {
+    console.error('Project ID bulunamadı!');
+    return null;
+  }
+  
   // Hemen görüntülenecek bir bildirim planlayalım
   await Notifications.scheduleNotificationAsync({
     content: {

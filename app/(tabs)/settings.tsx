@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Switch, Linking, ActivityIndicator, ScrollView, Image, ImageBackground, SafeAreaView, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Switch, Linking, ActivityIndicator, ScrollView, Image, ImageBackground, SafeAreaView, StatusBar, Alert, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Bell, Moon, Volume2, Clock, ChevronRight, Download, RefreshCw, Sun, Smartphone } from 'lucide-react-native';
 import Icon from 'react-native-vector-icons/FontAwesome'; // FontAwesome ikonları kullanılacak
@@ -80,6 +80,21 @@ export default function SettingsScreen() {
   };
 
   const checkNotificationPermissions = async () => {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+  
+    // Eğer izin henüz alınmamışsa isteyelim
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+  
+    if (finalStatus !== 'granted') {
+      Alert.alert("Bildirim İzni Gerekli", "Bildirimleri alabilmek için izin vermeniz gerekiyor.");
+      return;
+    }
+  
+    // İzin alındıysa, token al
     const token = await registerForPushNotificationsAsync();
     setNotifications(!!token);
   };
@@ -88,33 +103,17 @@ export default function SettingsScreen() {
     if (!notifications) {
       // Bildirimleri açmaya çalışalım
       try {
-        // Önce izinleri kontrol edelim
         const { status: existingStatus } = await Notifications.getPermissionsAsync();
         let finalStatus = existingStatus;
 
         // İzin yoksa isteyelim
         if (existingStatus !== 'granted') {
-          Alert.alert(
-            "Bildirim İzni Gerekli",
-            "Bildirimleri alabilmek için izin vermeniz gerekiyor.",
-            [
-              {
-                text: "İptal",
-                style: "cancel"
-              },
-              {
-                text: "Ayarlara Git",
-                onPress: () => {
-                  // Kullanıcıyı cihaz ayarlarına yönlendir
-                  if (Platform.OS === 'ios') {
-                    Linking.openURL('app-settings:');
-                  } else {
-                    Linking.openSettings();
-                  }
-                }
-              }
-            ]
-          );
+          const { status } = await Notifications.requestPermissionsAsync();
+          finalStatus = status;
+        }
+
+        if (finalStatus !== 'granted') {
+          Alert.alert("Bildirim İzni Gerekli", "Bildirimleri alabilmek için izin vermeniz gerekiyor.");
           return;
         }
 
@@ -122,7 +121,6 @@ export default function SettingsScreen() {
         const token = await registerForPushNotificationsAsync();
         if (token) {
           setNotifications(true);
-          // Başarılı bildirim
           Alert.alert("Başarılı", "Bildirimler başarıyla etkinleştirildi.");
         } else {
           Alert.alert("Hata", "Bildirimler etkinleştirilemedi. Lütfen daha sonra tekrar deneyin.");

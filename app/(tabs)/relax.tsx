@@ -395,7 +395,7 @@ export default function RelaxScreen() {
         if (sound) {
           const timer = setInterval(() => {
             playSubSound(sound);
-          }, 5000);
+          }, 15000);
           
           setSubSoundTimers(prev => ({ ...prev, [soundId]: timer }));
         }
@@ -585,6 +585,7 @@ export default function RelaxScreen() {
       />
       <ScrollView style={styles.content}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>Ana Sesler</Text>
+        <Text style={[styles.description, { color: colors.text }]}>Ortam seslerini oynatın</Text>
         <View style={styles.mainSounds}>
           {MAIN_SOUNDS.map((sound) => (
             <TouchableOpacity
@@ -628,6 +629,7 @@ export default function RelaxScreen() {
         </View>
 
         <Text style={[styles.sectionTitle, { color: colors.text }]}>Alt Sesler</Text>
+        <Text style={[styles.description, { color: colors.text }]}>Oynatmak için ana ses seçmelisiniz</Text>
         <View style={styles.subSounds}>
           {SUB_SOUNDS.map((sound) => (
             <TouchableOpacity

@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Moon, Heart, Settings, TreeDeciduousIcon } from 'lucide-react-native';
+import { Moon, Focus, Wind, Heart, Settings, TreeDeciduousIcon } from 'lucide-react-native';
 import { useTheme } from '../context/ThemeContext';
 
 export default function TabLayout() {
@@ -30,9 +30,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="relax"
         options={{
-          title: 'Rahatlama',
+          title: 'Esinti',
           tabBarIcon: ({ color, size }: { color: string; size: number }) => (
-            <Heart size={size} color={color} />
+            <Wind size={size} color={color} />
           ),
         }}
       />
