@@ -125,9 +125,9 @@ export default function SettingsScreen() {
         } else {
           Alert.alert("Hata", "Bildirimler etkinleştirilemedi. Lütfen daha sonra tekrar deneyin.");
         }
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Bildirim hatası:', error);
-        Alert.alert("Hata", "Bildirimler etkinleştirilemedi: " + error.message);
+        Alert.alert("Hata", "Bildirimler etkinleştirilemedi: " + (error as Error).message);
       }
     } else {
       // Bildirimleri kapatmak için
@@ -229,7 +229,7 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         )}
 
-        <View style={styles.section}>
+      <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Görünüm ve Ses</Text>
 
           <TouchableOpacity
@@ -252,7 +252,7 @@ export default function SettingsScreen() {
           </TouchableOpacity>
 
           <View style={[styles.settingItem, { borderBottomColor: colors.border }]}>
-            <View style={styles.settingLeft}>
+          <View style={styles.settingLeft}>
               <Bell size={24} color={colors.text} />
               <View style={styles.settingTextContainer}>
                 <Text style={[styles.settingText, { color: colors.text }]}>Bildirimler</Text>
@@ -260,17 +260,17 @@ export default function SettingsScreen() {
                   Yeni güncellemelerden haberdar ol
                 </Text>
               </View>
-            </View>
-            <Switch
-              value={notifications}
+          </View>
+          <Switch
+            value={notifications}
               onValueChange={handleNotificationToggle}
               trackColor={{ false: colors.switchTrack, true: colors.primary }}
               thumbColor={notifications ? colors.switchThumb : colors.switchThumb}
-            />
-          </View>
+          />
+        </View>
 
           <View style={[styles.settingItem, { borderBottomColor: colors.border }]}>
-            <View style={styles.settingLeft}>
+          <View style={styles.settingLeft}>
               <Volume2 size={24} color={colors.text} />
               <View style={styles.settingTextContainer}>
                 <Text style={[styles.settingText, { color: colors.text }]}>Ses Efektleri</Text>
@@ -278,10 +278,10 @@ export default function SettingsScreen() {
                   Uygulama ses efektlerini aç/kapat
                 </Text>
               </View>
-            </View>
-            <Switch
-              value={soundEffects}
-              onValueChange={setSoundEffects}
+          </View>
+          <Switch
+            value={soundEffects}
+            onValueChange={setSoundEffects}
               trackColor={{ false: colors.switchTrack, true: colors.primary }}
               thumbColor={soundEffects ? colors.switchThumb : colors.switchThumb}
             />
@@ -308,7 +308,7 @@ export default function SettingsScreen() {
             style={[styles.settingItem, { borderBottomColor: colors.border }]}
             onPress={() => handlePress('https://forum.asena.space/')}
           >
-            <View style={styles.settingLeft}>
+          <View style={styles.settingLeft}>
               {/* Icon image */}
               <Image
                 source={require('../../assets/images/forum.png')} // resmin doğru yolunu belirtin
@@ -317,15 +317,15 @@ export default function SettingsScreen() {
               <View style={styles.settingTextContainer}>
                 <Text style={[styles.settingText, { color: colors.text }]}>Asena Forum</Text>
               </View>
-            </View>
+          </View>
             <ChevronRight size={24} color={colors.text} />
-          </TouchableOpacity>
+        </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.settingItem, { borderBottomColor: colors.border }]}
             onPress={() => handlePress('https://www.instagram.com/asena.space/')} // Instagram profil linkini buraya ekleyin
           >
-            <View style={styles.settingLeft}>
+          <View style={styles.settingLeft}>
               {/* Instagram İkonu */}
               <Icon
                 name="instagram" // FontAwesome'dan Instagram ikonu
@@ -336,12 +336,12 @@ export default function SettingsScreen() {
               <View style={styles.settingTextContainer}>
                 <Text style={[styles.settingText, { color: colors.text }]}>@asena.space</Text>
               </View>
-            </View>
+          </View>
             <ChevronRight size={24} color={colors.text} />
-          </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
+      </View>
 
-        <View style={styles.section}>
+      <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Hakkında</Text>
 
           <TouchableOpacity style={[styles.settingItem, { borderBottomColor: colors.border }]}
@@ -362,7 +362,7 @@ export default function SettingsScreen() {
               </View>
             </View>
             <ChevronRight size={24} color={colors.text} />
-          </TouchableOpacity>
+        </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.settingItem, styles.updateCheck, { borderBottomColor: colors.border }]}
@@ -383,7 +383,7 @@ export default function SettingsScreen() {
             ) : (
               <ChevronRight size={24} color={colors.text} />
             )}
-          </TouchableOpacity>
+        </TouchableOpacity>
 
           <View style={[styles.settingItem, { borderBottomColor: colors.border }]}>
             <Text style={[styles.settingText, { color: colors.text }]}>Versiyon {currentVersion}</Text>
@@ -411,8 +411,8 @@ export default function SettingsScreen() {
                 {notifications ? 'Cihaza Test Bildirimi Gönder' : 'Bildirim İzni Gerekli'}
               </Text>
               <Bell size={20} color={colors.text} />
-            </TouchableOpacity>
-          </View>
+        </TouchableOpacity>
+      </View>
         )}
       </ScrollView>
     </SafeAreaView >

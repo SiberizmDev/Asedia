@@ -2,7 +2,7 @@
   "expo": {
     "name": "Asedia",
     "slug": "asedia",
-    "version": "1.4.2",
+    "version": "1.4.3",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "asedia",
@@ -24,7 +24,7 @@
         "foregroundImage": "./assets/notification-icon.png",
         "backgroundColor": "#101013"
       },
-      "versionCode": 2,
+      "versionCode": 1,
       "permissions": [
         "INTERNET",
         "ACCESS_NETWORK_STATE",
@@ -65,11 +65,13 @@
         "projectId": "73b063a3-1c70-4291-9653-2a51150c88e5"
       }
     },
-    "notification": {
-      "color": "#ffffff",
-      "iosDisplayInForeground": true,
-      "androidMode": "default",
-      "androidCollapsedTitle": "Yeni Güncelleme"
+    "expo": {
+      "notification": {
+        "icon": "./assets/icon.png",
+        "color": "#000000",
+        "androidMode": "default",
+        "androidCollapsedTitle": "Yeni Bildirim"
+      }
     }
   }
 }
