@@ -1,10 +1,11 @@
 {
-  "version": "1.5.0",
+  "version": "1.5.1",
   "title": "KARADELİK",
   "description": [
-    "Yeni özellik 1",
-    "Yeni özellik 2",
-    "Hata düzeltmesi"
+    "Yöresel Müzikler eklendi",
+    "İskoç müziği eklendi",
+    "Batı müziği eklendi",
+    "Texas müziği eklendi"
   ],
   "image": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/update.png"
 }
