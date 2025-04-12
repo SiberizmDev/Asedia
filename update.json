@@ -1,9 +1,10 @@
 {
   "version": "1.0.1",
-  "title": "Yeni Güncelleme",
+  "title": "Yeni Güncelleme Mevcut",
   "description": [
     "Yeni özellik 1",
     "Yeni özellik 2",
-    "Hata düzeltmesi 1"
-  ]
+    "Hata düzeltmesi"
+  ],
+  "image": "assets/images/update.png"
 }
