@@ -301,7 +301,7 @@ export default function SettingsScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Bize Ulaşın</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Ayaz Salih Koç Destek</Text>
 
           <TouchableOpacity
             style={[styles.settingItem, { borderBottomColor: colors.border }]}
@@ -320,9 +320,29 @@ export default function SettingsScreen() {
             <ChevronRight size={24} color={colors.text} />
         </TouchableOpacity>
 
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Bize Ulaşın</Text>
+
           <TouchableOpacity
             style={[styles.settingItem, { borderBottomColor: colors.border }]}
-            onPress={() => handlePress('https://www.instagram.com/asena.space/')} // Instagram profil linkini buraya ekleyin
+            onPress={() => handlePress('https://forum.asena.space/')}
+          >
+          <View style={styles.settingLeft}>
+              {/* Icon image */}
+              <Image
+                source={require('../../assets/images/ask.jpg')} // resmin doğru yolunu belirtin
+                style={{ width: 24, height: 24, marginRight: 10 }} // İkon boyutu
+              />
+              <View style={styles.settingTextContainer}>
+                <Text style={[styles.settingText, { color: colors.text }]}>Asena Forum</Text>
+              </View>
+          </View>
+            <ChevronRight size={24} color={colors.text} />
+        </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.settingItem, { borderBottomColor: colors.border }]}
+            onPress={() => handlePress('https://www.instagram.com/piijamali_spiderman/')} // Instagram profil linkini buraya ekleyin
           >
           <View style={styles.settingLeft}>
               {/* Instagram İkonu */}
@@ -333,7 +353,7 @@ export default function SettingsScreen() {
                 style={{ marginRight: 10 }} // Sağ boşluk
               />
               <View style={styles.settingTextContainer}>
-                <Text style={[styles.settingText, { color: colors.text }]}>@asena.space</Text>
+                <Text style={[styles.settingText, { color: colors.text }]}>@piijamali_spiderman</Text>
               </View>
           </View>
             <ChevronRight size={24} color={colors.text} />

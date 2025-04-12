@@ -1,11 +1,8 @@
 {
-  "version": "1.5.1",
-  "title": "KARADELİK",
+  "version": "1.6.0 (A.S.K. Speacial)",
+  "title": "A.S.K. Speacial Sürümü",
   "description": [
-    "Yöresel Müzikler eklendi",
-    "İskoç müziği eklendi",
-    "Batı müziği eklendi",
-    "Texas müziği eklendi"
+    "Yerli Spiderman Ayaz Salih Koç Özel Sürümü"
   ],
   "image": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/update.png"
 }
