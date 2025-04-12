@@ -156,16 +156,6 @@
           "soundUrl": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/sounds/timer-2.mp3",
           "isActive": false
         },
-             {
-          "id": "timer3",
-          "title": "Saat Tıkırtısı 3",
-          "description": "Geçen sürenin farkına varın",
-          "icon": "Clock",
-          "color": "#E91E63",
-          "background": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/clock2.jpg",
-          "soundUrl": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/sounds/timer-2.mp3",
-          "isActive": false
-        },
         {
           "id": "envcafe",
           "title": "Ortam (Kafe)",
