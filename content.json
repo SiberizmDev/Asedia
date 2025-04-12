@@ -25,6 +25,16 @@
           "isActive": false
         },
         {
+          "id": "grove",
+          "title": "Koru",
+          "description": "Doğanın esintisi",
+          "icon": "Tree",
+          "color": "#4CAF50",
+          "background": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/grove.jpg",
+          "soundUrl": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/sounds/grove.mp3",
+          "isActive": false
+        },
+        {
           "id": "night",
           "title": "Gece",
           "description": "Gecenin dinlendirici sesleri",
