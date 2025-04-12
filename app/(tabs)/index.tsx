@@ -1,50 +1,31 @@
-import React, { useEffect, useState, useRef, useCallback,useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ImageBackground, Modal, Dimensions, PanResponder, Animated, Platform, SafeAreaView, StatusBar } from 'react-native';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ImageBackground, Modal, Dimensions, PanResponder, Animated, Platform, SafeAreaView, StatusBar, ActivityIndicator, Alert, AppState } from 'react-native';
 import { Audio } from 'expo-av';
-import { Cloud, Moon, Wind, Star, Music2, BedDouble, Clock, ArrowLeft, Leaf, Tent, Play, Pause, X, Timer } from 'lucide-react-native';
+import * as Icons from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFonts, Inter_400Regular, Inter_600SemiBold, Inter_500Medium } from '@expo-google-fonts/inter';
 import { BlurView } from 'expo-blur';
 import { useTheme } from '../context/ThemeContext';
+import { useFocusEffect } from '@react-navigation/native';
 
-const SOUND_URLS = {
-  rain: require('../../assets/sounds/rain.mp3'),
-  grove: require('../../assets/sounds/grove.mp3'),
-  night: require('../../assets/sounds/night-ambiance.mp3'),
-  wind: require('../../assets/sounds/wind.mp3'),
-  meditation: require('../../assets/sounds/meditation.mp3'),
-  lullaby: require('../../assets/sounds/lullaby.mp3'),
-  dream: require('../../assets/sounds/dream.mp3'),
-  timer: require('../../assets/sounds/timer.mp3'),
-  timer2: require('../../assets/sounds/timer-2.mp3'),
-  memory: require('../../assets/sounds/memory.mp3'),
-  calm: require('../../assets/sounds/bamboo.mp3'),
-  nightsea: require('../../assets/sounds/sea.mp3'),
-  river: require('../../assets/sounds/river.mp3'),
-  campfire: require('../../assets/sounds/campfire.mp3'),
-  campfire2: require('../../assets/sounds/campfire-2.mp3'),
-  campfire3: require('../../assets/sounds/campfire-3.mp3'),
-  winter: require('../../assets/sounds/winter.mp3'),
-  hope: require('../../assets/sounds/hope.mp3'),
-  clouds: require('../../assets/sounds/clouds.mp3'),
-  envcafe: require('../../assets/sounds/envcafe.mp3'),
-  envlib: require('../../assets/sounds/envlib.mp3'),
+// GitHub raw content URL'leri
+const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/SiberizmDev/Asedia/main';
+const CONTENT_JSON_URL = `${GITHUB_BASE_URL}/content.json`;
 
-  west: require('../../assets/sounds/west.mp3'),
-  scots: require('../../assets/sounds/scots.mp3'),
-  texas: require('../../assets/sounds/texas.mp3'),
-  
-} as const;
-
-type SoundId = keyof typeof SOUND_URLS;
+type IconComponentType = React.ComponentType<{
+  size?: number;
+  color?: string;
+  strokeWidth?: number;
+}>;
 
 interface Sound {
-  id: SoundId;
+  id: string;
   title: string;
   description: string;
-  icon: any;
+  icon: string;
   color: string;
-  background: any;
+  background: any; // ImageSourcePropType için
+  soundUrl: string;
   isActive: boolean;
 }
 
@@ -63,16 +44,16 @@ const CATEGORIES: Category[] = [
         id: 'rain',
         title: 'Yağmurlu Koru',
         description: 'Yağmurlu bir gün',
-        icon: Cloud,
+        icon: Icons.Cloud,
         color: '#4CAF50',
         background: require('../../assets/images/rained_grove.jpeg'),
         isActive: false
       },
       {
-        id: 'grove',
+        id: 'grov2e',
         title: 'Koru',
         description: 'Doğanın esintisi',
-        icon: Cloud,
+        icon: Icons.Cloud,
         color: '#4CAF50',
         background: require('../../assets/images/grove.jpg'),
         isActive: false
@@ -81,7 +62,7 @@ const CATEGORIES: Category[] = [
         id: 'night',
         title: 'Gece',
         description: 'Geceniin dinlendirici sesleri',
-        icon: Leaf,
+        icon: Icons.Leaf,
         color: '#4CAF50',
         background: require('../../assets/images/night.jpg'),
         isActive: false
@@ -90,7 +71,7 @@ const CATEGORIES: Category[] = [
         id: 'campfire',
         title: 'Şömine',
         description: 'Kamp ateşinin çıtırtısı',
-        icon: Tent,
+        icon: Icons.Tent,
         color: '#FF5722',
         background: require('../../assets/images/campfire.jpg'),
         isActive: false
@@ -99,7 +80,7 @@ const CATEGORIES: Category[] = [
         id: 'campfire2',
         title: 'Şömine 2',
         description: 'Kamp ateşinin çıtırtısı',
-        icon: Tent,
+        icon: Icons.Tent,
         color: '#FF5722',
         background: require('../../assets/images/campfire-2.jpg'),
         isActive: false
@@ -108,7 +89,7 @@ const CATEGORIES: Category[] = [
         id: 'campfire3',
         title: 'Şömine 3',
         description: 'Kamp ateşinin çıtırtısı',
-        icon: Tent,
+        icon: Icons.Tent,
         color: '#FF5722',
         background: require('../../assets/images/campfire-3.jpg'),
         isActive: false
@@ -117,7 +98,7 @@ const CATEGORIES: Category[] = [
         id: 'nightsea',
         title: 'Okyanus Esintisi',
         description: 'Okyanusun sessiz sessizliği',
-        icon: Tent,
+        icon: Icons.Tent,
         color: '#FF5722',
         background: require('../../assets/images/ocean.jpg'),
         isActive: false
@@ -126,7 +107,7 @@ const CATEGORIES: Category[] = [
         id: 'river',
         title: 'Gece Nehri',
         description: 'Akarsuyun uyandırıcı sesi',
-        icon: Tent,
+        icon: Icons.Tent,
         color: '#FF5722',
         background: require('../../assets/images/default.jpg'),
         isActive: false
@@ -141,7 +122,7 @@ const CATEGORIES: Category[] = [
         id: 'memory',
         title: 'Hatıra',
         description: 'Hatıralarınıza dalın',
-        icon: Star,
+        icon: Icons.Star,
         color: '#9C27B0',
         background: require('../../assets/images/memory.jpeg'),
         isActive: false
@@ -150,7 +131,7 @@ const CATEGORIES: Category[] = [
         id: 'winter',
         title: 'Kış',
         description: 'Kış | by TOSH',
-        icon: Music2,
+        icon: Icons.Music2,
         color: '#2196F3',
         background: require('../../assets/images/winter.jpeg'),
         isActive: false
@@ -159,7 +140,7 @@ const CATEGORIES: Category[] = [
         id: 'hope',
         title: 'Umut',
         description: 'Umudunuzu canlandırın',
-        icon: Music2,
+        icon: Icons.Music2,
         color: '#2196F3',
         background: require('../../assets/images/hope.jpeg'),
         isActive: false
@@ -168,7 +149,7 @@ const CATEGORIES: Category[] = [
         id: 'clouds',
         title: 'Bulutlar',
         description: 'Bulutlar | by TOSH',
-        icon: Music2,
+        icon: Icons.Music2,
         color: '#2196F3',
         background: require('../../assets/images/clouds.jpg'),
         isActive: false
@@ -177,7 +158,7 @@ const CATEGORIES: Category[] = [
       //   id: 'night',
       //   title: 'Ay ışığı',
       //   description: 'Sakin gece melodileri',
-      //   icon: Moon,
+      //   icon: Icons.Moon,
       //   color: '#607D8B',
       //   background: require('../../assets/images/night.jpg'),
       //   isActive: false
@@ -192,7 +173,7 @@ const CATEGORIES: Category[] = [
         id: 'timer',
         title: 'Saat Tıkırtısı',
         description: 'Geçen sürenin farkına varın',
-        icon: Wind,
+        icon: Icons.Wind,
         color: '#9E9E9E',
         background: require('../../assets/images/clock.jpg'),
         isActive: false
@@ -201,7 +182,7 @@ const CATEGORIES: Category[] = [
         id: 'timer2',
         title: 'Saat Tıkırtısı 2',
         description: 'Geçen sürenin farkına varın',
-        icon: Wind,
+        icon: Icons.Wind,
         color: '#E91E63',
         background: require('../../assets/images/clock2.jpg'),
         isActive: false
@@ -210,7 +191,7 @@ const CATEGORIES: Category[] = [
         id: 'envcafe',
         title: 'Ortam (Kafe)',
         description: 'Kafe ortamında çalışın',
-        icon: Wind,
+        icon: Icons.Wind,
         color: '#795548',
         background: require('../../assets/images/cafe.jpg'),
         isActive: false
@@ -219,7 +200,7 @@ const CATEGORIES: Category[] = [
         id: 'envlib',
         title: 'Ortam (Kütüphane)',
         description: 'Kütüphane ortamında çalışın',
-        icon: Wind,
+        icon: Icons.Wind,
         color: '#795548',
         background: require('../../assets/images/library.jpg'),
         isActive: false
@@ -234,7 +215,7 @@ const CATEGORIES: Category[] = [
         id: 'meditation',
         title: 'Meditasyon',
         description: 'Meditasyon frekanslı ses',
-        icon: Wind,
+        icon: Icons.Wind,
         color: '#9E9E9E',
         background: require('../../assets/images/meditation.jpg'),
         isActive: false
@@ -243,7 +224,7 @@ const CATEGORIES: Category[] = [
         id: 'lullaby',
         title: 'Ninni',
         description: 'Yumuşak frekans sesi',
-        icon: Wind,
+        icon: Icons.Wind,
         color: '#E91E63',
         background: require('../../assets/images/lullaby.jpg'),
         isActive: false
@@ -252,7 +233,7 @@ const CATEGORIES: Category[] = [
         id: 'dream',
         title: 'Rüya',
         description: 'Derin frekans sesi',
-        icon: Wind,
+        icon: Icons.Wind,
         color: '#795548',
         background: require('../../assets/images/dream.jpg'),
         isActive: false
@@ -263,33 +244,34 @@ const CATEGORIES: Category[] = [
 
 export default function SleepScreen() {
   const { theme } = useTheme();
-  const [activeSounds, setActiveSounds] = useState(new Set<SoundId>());
-  const [sounds, setSounds] = useState<{ [key in SoundId]?: Audio.Sound }>({});
-  const [currentMix, setCurrentMix] = useState('');
-  const [currentBackground, setCurrentBackground] = useState<any>(null);
+  const [fontsLoaded] = useFonts({
+    'Inter-Regular': Inter_400Regular,
+    'Inter-SemiBold': Inter_600SemiBold,
+    'Inter-Medium': Inter_500Medium,
+  });
+  
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [activeSounds, setActiveSounds] = useState(new Set<string>());
+  const [sounds, setSounds] = useState<{ [key: string]: Audio.Sound }>({});
   const [selectedSound, setSelectedSound] = useState<Sound | null>(null);
   const [currentSound, setCurrentSound] = useState<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [nextSound, setNextSound] = useState<Sound | null>(null);
   const [activeSound, setActiveSound] = useState<Sound | null>(null);
   const [activeTimer, setActiveTimer] = useState<number | null>(null);
   const [remainingTime, setRemainingTime] = useState<number | null>(null);
   const [timerInterval, setTimerInterval] = useState<NodeJS.Timeout | null>(null);
 
   const translateY = useRef(new Animated.Value(0)).current;
-
-  // Create a flat array of all sounds
-  const allSounds = useRef(CATEGORIES.flatMap(category => category.sounds)).current;
+  const allSounds = useMemo(() => CATEGORIES.flatMap(category => category.sounds), []);
 
   // Timer options in seconds
-  const timerOptions = [
-    { label: '5 dk', value: 5 * 60 }, // 5 minutes = 5 * 60 seconds
-    { label: '10 dk', value: 10 * 60 }, // 10 minutes = 10 * 60 seconds
-    { label: '15 dk', value: 15 * 60 }, // 15 minutes = 15 * 60 seconds
-  ] as const;
-
-  type TimerOption = typeof timerOptions[number];
+  const timerOptions = useMemo(() => [
+    { label: '5 dk', value: 5 * 60 },
+    { label: '10 dk', value: 10 * 60 },
+    { label: '15 dk', value: 15 * 60 },
+  ], []);
 
   const formatTime = useCallback((seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
@@ -345,90 +327,75 @@ export default function SleepScreen() {
     setTimerInterval(null);
   }, [timerInterval]);
 
-  const handleSoundChange = async (newSound: Sound) => {
+  const handleSoundChange = useCallback(async (newSound: Sound) => {
     try {
-      // Stop and unload current sound
       if (currentSound) {
         await currentSound.stopAsync();
         await currentSound.unloadAsync();
       }
 
-      // Create and load new sound
       const soundObject = new Audio.Sound();
-      await soundObject.loadAsync(SOUND_URLS[newSound.id]);
+      await soundObject.loadAsync({ uri: newSound.soundUrl });
       await soundObject.setIsLoopingAsync(true);
       await soundObject.playAsync();
 
-      // Update states
       setCurrentSound(soundObject);
       setSelectedSound(newSound);
       setActiveSound(newSound);
       setIsPlaying(true);
-
     } catch (error) {
       console.error('Error changing sound:', error);
+      Alert.alert('Hata', 'Ses dosyası yüklenirken bir hata oluştu.');
     }
-  };
+  }, [currentSound]);
 
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onPanResponderMove: (_, gesture) => {
-        translateY.setValue(gesture.dy);
-      },
-      onPanResponderRelease: (_, gesture) => {
-        const SWIPE_THRESHOLD = 100;
+  const panResponder = useMemo(() => PanResponder.create({
+    onStartShouldSetPanResponder: () => true,
+    onPanResponderMove: (_, gesture) => {
+      translateY.setValue(gesture.dy);
+    },
+    onPanResponderRelease: (_, gesture) => {
+      const SWIPE_THRESHOLD = 100;
+      const { height } = Dimensions.get('window');
 
-        if (Math.abs(gesture.dy) > SWIPE_THRESHOLD && selectedSound) {
-          const currentIndex = allSounds.findIndex(s => s.id === selectedSound.id);
+      if (Math.abs(gesture.dy) > SWIPE_THRESHOLD && selectedSound) {
+        const currentIndex = allSounds.findIndex(s => s.id === selectedSound.id);
 
-          if (currentIndex !== -1) {
-            let nextIndex;
-            if (gesture.dy > 0) { // Swipe down - previous
-              nextIndex = (currentIndex - 1 + allSounds.length) % allSounds.length;
-            } else { // Swipe up - next
-              nextIndex = (currentIndex + 1) % allSounds.length;
-            }
-
-            const newSound = allSounds[nextIndex];
-
-            // Animate out current content
-            Animated.timing(translateY, {
-              toValue: gesture.dy > 0 ? height : -height,
-              duration: 200,
-              useNativeDriver: true,
-            }).start(async () => {
-              // Change sound immediately
-              await handleSoundChange(newSound);
-
-              // Reset position and animate in new content
-              translateY.setValue(gesture.dy > 0 ? -height : height);
-              Animated.spring(translateY, {
-                toValue: 0,
-                useNativeDriver: true,
-                tension: 40,
-                friction: 7
-              }).start();
-            });
+        if (currentIndex !== -1) {
+          let nextIndex;
+          if (gesture.dy > 0) {
+            nextIndex = (currentIndex - 1 + allSounds.length) % allSounds.length;
+          } else {
+            nextIndex = (currentIndex + 1) % allSounds.length;
           }
-        } else {
-          // If not swiped far enough, spring back to center
-          Animated.spring(translateY, {
-            toValue: 0,
-            useNativeDriver: true,
-            tension: 40,
-            friction: 7
-          }).start();
-        }
-      }
-    })
-  ).current;
 
-  const [fontsLoaded] = useFonts({
-    'Inter-Regular': Inter_400Regular,
-    'Inter-SemiBold': Inter_600SemiBold,
-    'Inter-Medium': Inter_500Medium,
-  });
+          const newSound = allSounds[nextIndex];
+
+          Animated.timing(translateY, {
+            toValue: gesture.dy > 0 ? height : -height,
+            duration: 200,
+            useNativeDriver: true,
+          }).start(async () => {
+            await handleSoundChange(newSound);
+            translateY.setValue(gesture.dy > 0 ? -height : height);
+            Animated.spring(translateY, {
+              toValue: 0,
+              useNativeDriver: true,
+              tension: 40,
+              friction: 7
+            }).start();
+          });
+        }
+      } else {
+        Animated.spring(translateY, {
+          toValue: 0,
+          useNativeDriver: true,
+          tension: 40,
+          friction: 7
+        }).start();
+      }
+    }
+  }), [translateY, selectedSound, allSounds, handleSoundChange]);
 
   useEffect(() => {
     return () => {
@@ -451,20 +418,78 @@ export default function SleepScreen() {
     });
   }, []);
 
-  if (!fontsLoaded) {
-    return null;
-  }
+  // AppState için ref
+  const appState = useRef(AppState.currentState);
 
-  const handleSoundPress = async (sound: Sound) => {
+  // İçerik yenileme fonksiyonu
+  const refreshContent = useCallback(async () => {
     try {
-      // Stop current sound if playing
+      setLoading(true);
+      setError(null);
+      
+      const response = await fetch(CONTENT_JSON_URL, {
+        cache: 'no-store', // Cache'i devre dışı bırak
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
+      
+      if (!response.ok) throw new Error('Content fetch failed');
+      
+      const data = await response.json();
+      const processedCategories = data.categories.map(category => ({
+        ...category,
+        sounds: category.sounds.map(sound => ({
+          ...sound,
+          isActive: false
+        }))
+      }));
+      
+      setCategories(processedCategories);
+    } catch (error) {
+      console.error('Error loading content:', error);
+      setError('İçerik yüklenirken bir hata oluştu. Lütfen internet bağlantınızı kontrol edin.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Sayfa fokuslandığında içeriği yenile
+  useFocusEffect(
+    useCallback(() => {
+      refreshContent();
+    }, [refreshContent])
+  );
+
+  // App state değiştiğinde içeriği yenile
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', nextAppState => {
+      if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
+        refreshContent();
+      }
+      appState.current = nextAppState;
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [refreshContent]);
+
+  // Component mount olduğunda içeriği yükle
+  useEffect(() => {
+    refreshContent();
+  }, [refreshContent]);
+
+  const handleSoundPress = useCallback(async (sound: Sound) => {
+    try {
       if (currentSound) {
         await currentSound.stopAsync();
         await currentSound.unloadAsync();
       }
 
       const soundObject = new Audio.Sound();
-      await soundObject.loadAsync(SOUND_URLS[sound.id]);
+      await soundObject.loadAsync({ uri: sound.soundUrl });
       await soundObject.setIsLoopingAsync(true);
       await soundObject.playAsync();
 
@@ -472,23 +497,13 @@ export default function SleepScreen() {
       setSelectedSound(sound);
       setActiveSound(sound);
       setIsPlaying(true);
-
-      // Update categories to set isActive
-      const updatedCategories = CATEGORIES.map(category => ({
-        ...category,
-        sounds: category.sounds.map(s => ({
-          ...s,
-          isActive: s.id === sound.id
-        }))
-      }));
-
-      // You might want to update your state with updatedCategories here
     } catch (error) {
       console.error('Error playing sound:', error);
+      Alert.alert('Hata', 'Ses dosyası yüklenirken bir hata oluştu.');
     }
-  };
+  }, [currentSound]);
 
-  const togglePlayback = async () => {
+  const togglePlayback = useCallback(async () => {
     if (!currentSound) return;
 
     try {
@@ -501,6 +516,15 @@ export default function SleepScreen() {
     } catch (error) {
       console.error('Error toggling playback:', error);
     }
+  }, [currentSound, isPlaying]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
+  // İkon mapping fonksiyonu güncellendi
+  const getIconComponent = (iconName: string): IconComponentType => {
+    return Icons[iconName as keyof typeof Icons] || Icons.Cloud;
   };
 
   return (
@@ -512,7 +536,7 @@ export default function SleepScreen() {
       />
       <View style={styles.container}>
         <ImageBackground
-          source={activeSound?.background || require('../../assets/images/night.jpg')}
+          source={activeSound?.background ? { uri: activeSound.background } : require('../../assets/images/night.jpg')}
           style={StyleSheet.absoluteFill}
           blurRadius={theme === 'light' ? 60 : 80}
         >
@@ -529,75 +553,95 @@ export default function SleepScreen() {
         </ImageBackground>
 
         <ScrollView style={styles.content}>
-          {CATEGORIES.map((category, index) => (
-            <View key={index} style={styles.categorySection}>
-              <View style={styles.categoryHeader}>
-                <Text style={styles.categoryTitle}>{category.title}</Text>
-                <Text style={styles.categorySubtitle}>{category.subtitle}</Text>
-              </View>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.soundsRow}>
-                {category.sounds.map((sound) => (
-                  <TouchableOpacity
-                    key={sound.id}
-                    style={[
-                      styles.soundCard,
-                      activeSound?.id === sound.id && styles.activeSoundCard,
-                      sound === category.sounds[category.sounds.length - 1] && styles.lastSoundCard
-                    ]}
-                    onPress={() => handleSoundPress(sound)}
-                  >
-                    <ImageBackground
-                      source={sound.background}
-                      style={styles.soundCardBackground}
-                      imageStyle={styles.soundCardImage}
-                    >
-                      <LinearGradient
-                        colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.7)']}
-                        style={styles.soundCardOverlay}
-                      >
-                        {activeSound?.id === sound.id && (
-                          <View style={styles.activeCardControls}>
-                            <TouchableOpacity
-                              style={styles.cardControlButton}
-                              onPress={togglePlayback}
-                            >
-                              {isPlaying ? (
-                                <Pause size={24} color="#fff" />
-                              ) : (
-                                <Play size={24} color="#fff" />
-                              )}
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                              style={styles.cardControlButton}
-                              onPress={() => {
-                                if (currentSound) {
-                                  currentSound.stopAsync();
-                                  currentSound.unloadAsync();
-                                }
-                                setActiveSound(null);
-                                setCurrentSound(null);
-                                setIsPlaying(false);
-                              }}
-                            >
-                              <X size={24} color="#fff" />
-                            </TouchableOpacity>
-                          </View>
-                        )}
-                        <Text style={styles.soundCardTitle}>{sound.title}</Text>
-                      </LinearGradient>
-                    </ImageBackground>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#fff" />
+              <Text style={styles.loadingText}>İçerik yükleniyor...</Text>
             </View>
-          ))}
+          ) : error ? (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{error}</Text>
+              <TouchableOpacity style={styles.retryButton} onPress={refreshContent}>
+                <Text style={styles.retryButtonText}>Tekrar Dene</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            categories.map((category, index) => (
+              <View key={index} style={styles.categorySection}>
+                <View style={styles.categoryHeader}>
+                  <Text style={styles.categoryTitle}>{category.title}</Text>
+                  <Text style={styles.categorySubtitle}>{category.subtitle}</Text>
+                </View>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.soundsRow}>
+                  {category.sounds.map((sound) => {
+                    const IconComponent = getIconComponent(sound.icon);
+                    return (
+                      <TouchableOpacity
+                        key={sound.id}
+                        style={[
+                          styles.soundCard,
+                          activeSound?.id === sound.id && styles.activeSoundCard,
+                          sound === category.sounds[category.sounds.length - 1] && styles.lastSoundCard
+                        ]}
+                        onPress={() => handleSoundPress(sound)}
+                      >
+                        <ImageBackground
+                          source={{ uri: sound.background }}
+                          style={styles.soundCardBackground}
+                          imageStyle={styles.soundCardImage}
+                        >
+                          <LinearGradient
+                            colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.7)']}
+                            style={styles.soundCardOverlay}
+                          >
+                            {activeSound?.id === sound.id && (
+                              <View style={styles.activeCardControls}>
+                                <TouchableOpacity
+                                  style={styles.cardControlButton}
+                                  onPress={togglePlayback}
+                                >
+                                  {isPlaying ? (
+                                    <Icons.Pause size={24} color="#fff" />
+                                  ) : (
+                                    <Icons.Play size={24} color="#fff" />
+                                  )}
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                  style={styles.cardControlButton}
+                                  onPress={() => {
+                                    if (currentSound) {
+                                      currentSound.stopAsync();
+                                      currentSound.unloadAsync();
+                                    }
+                                    setActiveSound(null);
+                                    setCurrentSound(null);
+                                    setIsPlaying(false);
+                                  }}
+                                >
+                                  <Icons.X size={24} color="#fff" />
+                                </TouchableOpacity>
+                              </View>
+                            )}
+                            <View style={styles.soundCardContent}>
+                              <IconComponent />
+                              <Text style={styles.soundCardTitle}>{sound.title}</Text>
+                            </View>
+                          </LinearGradient>
+                        </ImageBackground>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+              </View>
+            ))
+          )}
         </ScrollView>
 
         {activeSound && (
           <>
             <View style={styles.floatingControls}>
               <ImageBackground
-                source={activeSound.background}
+                source={typeof activeSound.background === 'string' ? { uri: activeSound.background } : activeSound.background}
                 style={StyleSheet.absoluteFill}
                 blurRadius={25}
               >
@@ -608,11 +652,7 @@ export default function SleepScreen() {
                 >
                   <View style={[
                     StyleSheet.absoluteFill, 
-                    { 
-                      backgroundColor: theme === 'light' 
-                        ? 'rgba(255, 255, 255, 0.2)' 
-                        : 'rgba(0, 0, 0, 0.3)' 
-                    }
+                    { backgroundColor: theme === 'light' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.3)' }
                   ]} />
                 </BlurView>
               </ImageBackground>
@@ -628,7 +668,7 @@ export default function SleepScreen() {
                     }
                   }}
                 >
-                  <Timer size={24} color="#fff" />
+                  <Icons.Timer size={24} color="#fff" />
                   {remainingTime && (
                     <View style={styles.timerBadge}>
                       <Text style={styles.timerBadgeText}>{formatTime(remainingTime)}</Text>
@@ -642,9 +682,9 @@ export default function SleepScreen() {
                   onPress={togglePlayback}
                 >
                   {isPlaying ? (
-                    <Pause size={24} color="#fff" />
+                    <Icons.Pause size={24} color="#fff" />
                   ) : (
-                    <Play size={24} color="#fff" />
+                    <Icons.Play size={24} color="#fff" />
                   )}
                 </TouchableOpacity>
 
@@ -662,14 +702,14 @@ export default function SleepScreen() {
                     cancelTimer();
                   }}
                 >
-                  <X size={24} color="#fff" />
+                  <Icons.X size={24} color="#fff" />
                 </TouchableOpacity>
               </View>
             </View>
 
             <View style={styles.floatingPlaybar}>
               <ImageBackground
-                source={activeSound.background}
+                source={typeof activeSound.background === 'string' ? { uri: activeSound.background } : activeSound.background}
                 style={StyleSheet.absoluteFill}
                 blurRadius={25}
               >
@@ -682,7 +722,7 @@ export default function SleepScreen() {
                 onPress={() => setSelectedSound(activeSound)}
               >
                 <ImageBackground
-                  source={activeSound.background}
+                  source={typeof activeSound.background === 'string' ? { uri: activeSound.background } : activeSound.background}
                   style={styles.playbarImage}
                   imageStyle={{ borderRadius: 8 }}
                 />
@@ -705,7 +745,7 @@ export default function SleepScreen() {
           {selectedSound && (
             <View style={styles.modalContainer}>
               <ImageBackground
-                source={selectedSound.background}
+                source={typeof selectedSound.background === 'string' ? { uri: selectedSound.background } : selectedSound.background}
                 style={StyleSheet.absoluteFill}
               >
                 <BlurView intensity={theme === 'light' ? 40 : 20} tint={theme === 'light' ? 'light' : 'dark'} style={StyleSheet.absoluteFill} />
@@ -719,7 +759,7 @@ export default function SleepScreen() {
                     style={styles.closeButton}
                     onPress={() => setSelectedSound(null)}
                   >
-                    <ArrowLeft size={24} color="#fff" />
+                    <Icons.ArrowLeft size={24} color="#fff" />
                   </TouchableOpacity>
 
                   <View style={styles.modalInfo}>
@@ -732,9 +772,9 @@ export default function SleepScreen() {
                         onPress={togglePlayback}
                       >
                         {isPlaying ? (
-                          <Pause size={32} color="#fff" />
+                          <Icons.Pause size={32} color="#fff" />
                         ) : (
-                          <Play size={32} color="#fff" />
+                          <Icons.Play size={32} color="#fff" />
                         )}
                       </TouchableOpacity>
                     </View>
@@ -849,10 +889,20 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     padding: 15,
   },
+  soundCardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    paddingLeft: 0,
+    marginLeft: -12,
+  },
   soundCardTitle: {
     color: '#fff',
     fontSize: 20,
     fontFamily: 'Inter-SemiBold',
+    textAlign: 'left',
+    marginLeft: 4,
+    flex: 1,
   },
   modalContainer: {
     flex: 1,
@@ -981,6 +1031,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 12,
+    paddingLeft: 8,
   },
   playbarImage: {
     width: 48,
@@ -989,17 +1040,22 @@ const styles = StyleSheet.create({
   },
   playbarInfo: {
     flex: 1,
+    marginLeft: 4,
   },
   playbarTitle: {
     color: '#fff',
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
+    textAlign: 'left',
+    marginLeft: 0,
   },
   playbarDescription: {
     color: 'rgba(255,255,255,0.6)',
     fontSize: 14,
     fontFamily: 'Inter-Regular',
     marginTop: 2,
+    textAlign: 'left',
+    marginLeft: 0,
   },
   playbarControl: {
     width: 44,
@@ -1071,6 +1127,43 @@ const styles = StyleSheet.create({
   timerBadgeText: {
     color: '#fff',
     fontSize: 12,
+    fontFamily: 'Inter-Regular',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 100,
+  },
+  loadingText: {
+    color: '#fff',
+    marginTop: 16,
+    fontSize: 16,
+    fontFamily: 'Inter-Regular',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 100,
+    padding: 20,
+  },
+  errorText: {
+    color: '#fff',
+    fontSize: 16,
+    fontFamily: 'Inter-Regular',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  retryButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+  },
+  retryButtonText: {
+    color: '#fff',
+    fontSize: 16,
     fontFamily: 'Inter-Regular',
   },
 });

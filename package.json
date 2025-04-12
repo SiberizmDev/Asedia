@@ -1,7 +1,7 @@
 {
   "name": "asedia",
   "main": "expo-router/entry",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "private": true,
   "scripts": {
     "dev": "EXPO_NO_TELEMETRY=1 expo start",
@@ -38,6 +38,7 @@
     "expo-status-bar": "~2.0.1",
     "expo-symbols": "~0.2.2",
     "expo-system-ui": "~4.0.9",
+    "expo-updates": "^0.27.4",
     "expo-web-browser": "~14.0.2",
     "lucide-react-native": "^0.475.0",
     "react": "18.3.1",
@@ -58,6 +59,7 @@
     "@babel/core": "^7.25.2",
     "@types/react": "~18.3.12",
     "@types/react-native": "^0.72.8",
+    "@types/react-native-vector-icons": "^6.4.18",
     "typescript": "^5.3.3"
   }
 }

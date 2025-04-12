@@ -2,12 +2,18 @@
   "expo": {
     "name": "Asedia",
     "slug": "asedia",
-    "version": "1.6.1", 
+    "version": "1.6.2", 
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "asedia",
     "userInterfaceStyle": "dark",
     "backgroundColor": "#101013",
+
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.asena.space",
@@ -31,7 +37,7 @@
         "RECEIVE_BOOT_COMPLETED",
         "VIBRATE",
         "POST_NOTIFICATIONS",
-         "REQUEST_INSTALL_PACKAGES",
+        "REQUEST_INSTALL_PACKAGES",
         "WRITE_EXTERNAL_STORAGE"
       ],
       "useNextNotificationsApi": true,
@@ -54,10 +60,7 @@
         {
           "icon": "./assets/notification-icon.png",
           "color": "#ffffff",
-          "sounds": ["./assets/notification.wav"],
-          "androidMode": "default",
-          "androidCollapsedTitle": "Asedia",
-          "iosDisplayInForeground": true
+          "sounds": ["./assets/notification.wav"]
         }
       ]
     ],
@@ -71,13 +74,6 @@
       "eas": {
         "projectId": "73b063a3-1c70-4291-9653-2a51150c88e5"
       }
-    },
-    "notification": {
-      "icon": "./assets/notification-icon.png",
-      "color": "#ffffff",
-      "androidMode": "default",
-      "androidCollapsedTitle": "Asedia",
-      "iosDisplayInForeground": true
     }
   }
 }

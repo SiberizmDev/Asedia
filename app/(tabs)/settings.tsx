@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Switch, Linking, ActivityIndicator, ScrollView, Image, ImageBackground, SafeAreaView, StatusBar, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Switch, Linking, ActivityIndicator, ScrollView, Image, ImageBackground, SafeAreaView, StatusBar, Alert, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Bell, Moon, Volume2, Clock, ChevronRight, Download, RefreshCw, Sun, Smartphone } from 'lucide-react-native';
 import Icon from 'react-native-vector-icons/FontAwesome'; // FontAwesome ikonları kullanılacak
@@ -21,6 +21,15 @@ type UpdateInfo = {
   image: string;
 };
 
+// Bildirim ayarlarını yapılandır
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
+
 export default function SettingsScreen() {
   const router = useRouter();
   const [notifications, setNotifications] = useState(false);
@@ -30,6 +39,8 @@ export default function SettingsScreen() {
   const [isChecking, setIsChecking] = useState(false);
   const currentVersion = Constants.expoConfig?.version || '0.1.0';
   const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
+  const [expoPushToken, setExpoPushToken] = useState<string | undefined>();
+  const [notificationPermission, setNotificationPermission] = useState<boolean>(false);
 
   const { theme, setTheme, colors } = useTheme();
 
@@ -53,7 +64,13 @@ export default function SettingsScreen() {
   const checkForUpdates = async () => {
     try {
       setIsChecking(true);
-      const response = await fetch('https://raw.githubusercontent.com/SiberizmDev/Asedia/main/update.json');
+      const response = await fetch('https://raw.githubusercontent.com/SiberizmDev/Asedia/main/update.json', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
       
       if (!response.ok) {
         console.log('Güncelleme bilgisi alınamadı:', response.status);
@@ -66,6 +83,10 @@ export default function SettingsScreen() {
       // Versiyon kontrolü
       if (data.version && data.version !== currentVersion) {
         console.log('Yeni güncelleme bulundu:', data.version);
+        // Resim URL'sine timestamp ekle
+        if (data.image) {
+          data.image = `${data.image}?t=${new Date().getTime()}`;
+        }
         setUpdateInfo(data);
         setUpdateAvailable(true);
         setLatestVersion(data.version);
@@ -81,29 +102,148 @@ export default function SettingsScreen() {
   };
 
   const checkNotificationPermissions = async () => {
-    const token = await registerForPushNotificationsAsync();
-    setNotifications(!!token);
+    try {
+      if (!Device.isDevice) {
+        Alert.alert('Hata', 'Bildirimler sadece fiziksel cihazlarda çalışır.');
+        return;
+      }
+
+      // Android 13+ için özel izin kontrolü
+      if (Platform.OS === 'android' && Platform.Version >= 33) {
+        const { status: existingStatus } = await Notifications.getPermissionsAsync();
+        console.log('Android 13+ bildirim izni durumu:', existingStatus);
+
+        if (existingStatus !== 'granted') {
+          const { status } = await Notifications.requestPermissionsAsync({
+            android: {
+              importance: Notifications.AndroidImportance.HIGH,
+              allowAlert: true,
+              allowBadge: true,
+              allowSound: true,
+              allowAnnouncements: true,
+            }
+          });
+          
+          if (status !== 'granted') {
+            console.log('Android 13+ bildirim izni reddedildi');
+            setNotificationPermission(false);
+            setNotifications(false);
+            Alert.alert(
+              "Bildirim İzni Gerekli",
+              "Android 13 ve üzeri için özel bildirim izni gerekiyor. Lütfen ayarlardan izin verin.",
+              [
+                { text: "İptal", style: "cancel" },
+                { text: "Ayarlara Git", onPress: () => Linking.openSettings() }
+              ]
+            );
+            return;
+          }
+        }
+      } else {
+        // Android 13 altı ve diğer platformlar için normal izin kontrolü
+        const { status } = await Notifications.getPermissionsAsync();
+        if (status !== 'granted') {
+          const { status: newStatus } = await Notifications.requestPermissionsAsync();
+          if (newStatus !== 'granted') {
+            setNotificationPermission(false);
+            setNotifications(false);
+            return;
+          }
+        }
+      }
+
+      // Token alma işlemi
+      const token = await Notifications.getExpoPushTokenAsync({
+        projectId: "73b063a3-1c70-4291-9653-2a51150c88e5"
+      });
+      
+      console.log('Push Token:', token.data);
+      setExpoPushToken(token.data);
+      setNotificationPermission(true);
+      setNotifications(true);
+
+    } catch (error) {
+      console.error('Bildirim izni hatası:', error);
+      setNotificationPermission(false);
+      setNotifications(false);
+    }
   };
 
   const handleNotificationToggle = async () => {
     if (!notifications) {
+      if (!Device.isDevice) {
+        Alert.alert('Hata', 'Bildirimler sadece fiziksel cihazlarda çalışır.');
+        return;
+      }
+
       try {
-        const token = await registerForPushNotificationsAsync();
-        
-        if (token) {
-          setNotifications(true);
-          Alert.alert(
-            "Başarılı", 
-            "Bildirimler başarıyla etkinleştirildi."
-          );
+        // Android 13+ için özel izin kontrolü
+        if (Platform.OS === 'android' && Platform.Version >= 33) {
+          const { status: existingStatus } = await Notifications.getPermissionsAsync();
+          
+          if (existingStatus !== 'granted') {
+            const { status } = await Notifications.requestPermissionsAsync({
+              android: {
+                importance: Notifications.AndroidImportance.HIGH,
+                allowAlert: true,
+                allowBadge: true,
+                allowSound: true,
+                allowAnnouncements: true,
+              }
+            });
+            
+            if (status !== 'granted') {
+              Alert.alert(
+                "Bildirim İzni Gerekli",
+                "Android 13 ve üzeri için özel bildirim izni gerekiyor. Lütfen ayarlardan izin verin.",
+                [
+                  { text: "İptal", style: "cancel" },
+                  { text: "Ayarlara Git", onPress: () => Linking.openSettings() }
+                ]
+              );
+              return;
+            }
+          }
         } else {
-          throw new Error('Bildirim izni alınamadı');
+          // Android 13 altı ve diğer platformlar için normal izin kontrolü
+          const { status } = await Notifications.getPermissionsAsync();
+          if (status !== 'granted') {
+            const { status: newStatus } = await Notifications.requestPermissionsAsync();
+            if (newStatus !== 'granted') {
+              Alert.alert(
+                "Bildirim İzni Gerekli",
+                "Bildirimleri etkinleştirmek için lütfen uygulama ayarlarından izin verin.",
+                [
+                  { text: "İptal", style: "cancel" },
+                  { text: "Ayarlara Git", onPress: () => Linking.openSettings() }
+                ]
+              );
+              return;
+            }
+          }
         }
+
+        const token = await Notifications.getExpoPushTokenAsync({
+          projectId: "73b063a3-1c70-4291-9653-2a51150c88e5"
+        });
+        
+        console.log('Push Token:', token.data);
+        setExpoPushToken(token.data);
+        setNotificationPermission(true);
+        setNotifications(true);
+        
+        // Test bildirimi gönder
+        await handleTestNotification();
+
       } catch (error) {
         console.error('Bildirim hatası:', error);
         Alert.alert(
-          "Hata",
-          "Bildirimleri etkinleştirmek için lütfen uygulama ayarlarından izin verin."
+          "Bildirim İzni Gerekli",
+          "Bildirimleri etkinleştirmek için lütfen uygulama ayarlarından izin verin.",
+          [
+            { text: "İptal", style: "cancel" },
+            { text: "Ayarlara Git", onPress: () => Linking.openSettings() }
+          ]
         );
       }
     } else {
@@ -112,20 +252,40 @@ export default function SettingsScreen() {
         "Bildirimleri kapatmak için cihaz ayarlarını kullanmanız gerekiyor.",
         [
           { text: "İptal", style: "cancel" },
-          {
-            text: "Ayarlara Git",
-            onPress: () => Linking.openSettings()
-          }
+          { text: "Ayarlara Git", onPress: () => Linking.openSettings() }
         ]
       );
     }
   };
 
   const handleTestNotification = async () => {
+    if (!notificationPermission || !expoPushToken) {
+      Alert.alert('Hata', 'Bildirim izni verilmemiş veya token alınamadı.');
+      return;
+    }
+
     try {
-      await sendTestNotification();
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Test Bildirimi",
+          body: "Bu bir test bildirimidir. Bildirimler başarıyla çalışıyor!",
+          sound: true,
+          priority: Notifications.AndroidNotificationPriority.HIGH,
+          android: {
+            channelId: 'default',
+            importance: Notifications.AndroidImportance.HIGH,
+            priority: 'high',
+            vibrate: [0, 250, 250, 250],
+          }
+        },
+        trigger: null,
+      });
+      
+      console.log('Test bildirimi gönderildi');
+      Alert.alert('Başarılı', 'Test bildirimi gönderildi. Lütfen bildirim gelip gelmediğini kontrol edin.');
     } catch (error) {
-      console.error('Test notification error:', error);
+      console.error('Test bildirimi hatası:', error);
+      Alert.alert('Hata', 'Test bildirimi gönderilemedi: ' + (error instanceof Error ? error.message : String(error)));
     }
   };
 
@@ -173,6 +333,21 @@ export default function SettingsScreen() {
     Linking.openURL(url);
   };
 
+  // Component mount olduğunda bildirim izinlerini kontrol et
+  useEffect(() => {
+    checkNotificationPermissions();
+
+    // Bildirim alıcısını ayarla
+    const subscription = Notifications.addNotificationReceivedListener(notification => {
+      console.log('Bildirim alındı:', notification);
+    });
+
+    // Cleanup
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme === 'light' ? '#FFFFFF' : colors.background[0] }]}>
       <StatusBar
@@ -197,8 +372,11 @@ export default function SettingsScreen() {
               </View>
 
               {updateInfo.image && (
-                <Image 
-                  source={{ uri: updateInfo.image }}
+                <ImageBackground 
+                  source={{ 
+                    uri: updateInfo.image,
+                    cache: 'reload'
+                  }}
                   style={styles.updateImage}
                   resizeMode="cover"
                 />

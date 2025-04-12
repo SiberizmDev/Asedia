@@ -1,9 +1,10 @@
 {
-  "version": "1.6.1 (A.S.K. Special)",
+  "version": "1.6.2 (A.S.K. Special)",
   "title": "A.S.K. Special Sürümü",
   "description": [
     "Yerli Spiderman Ayaz Salih Koç Özel Sürümü",
     "Bizim desteğimize ihtiyacı olan Yerli Spiderman adı ile tanınan Ayaz Salih Koç'a destek niteliğinde çıkarılan özel bir sürüm",
+    "Ana saydadaki içerikler artık internet üzerinden çekiliyor ve yeni içerikler eklenince yeni güncelleme kurmanız gerekmeyecek",
     "Türkiye'nin yöreleri eklendi",
     "Hemşin müziği eklendi",
     "Forum linki değiştirildi",
