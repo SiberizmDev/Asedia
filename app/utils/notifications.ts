@@ -12,71 +12,74 @@ Notifications.setNotificationHandler({
 });
 
 export async function registerForPushNotificationsAsync() {
-  // Fiziksel bir cihaz mı kontrol edelim (bildirimler simülatörlerde çalışmaz)
-  const deviceType = await Device.getDeviceTypeAsync();
-  if (deviceType !== Device.DeviceType.PHONE) {
-    console.log('Bildirimler için fiziksel cihaz gerekli');
-    return;
+  let token;
+
+  if (Platform.OS === 'android') {
+    // Android kanalı oluştur
+    await Notifications.setNotificationChannelAsync('default', {
+      name: 'default',
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#FF231F7C',
+    });
   }
 
-  // İzin durumunu kontrol edelim
-  const { status: existingStatus } = await Notifications.getPermissionsAsync();
-  let finalStatus = existingStatus;
-  
-  // Eğer izin henüz alınmamışsa isteyelim
-  if (existingStatus !== 'granted') {
-    const { status } = await Notifications.requestPermissionsAsync();
-    finalStatus = status;
-  }
+  if (Device.isDevice) {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
 
-  // İzin yoksa çıkalım
-  if (finalStatus !== 'granted') {
-    console.log('Bildirim izni alınamadı!');
-    return;
-  }
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
 
-  try {
-    // Project ID kontrolü ekleyelim
-    if (!Constants.expoConfig || !Constants.expoConfig.extra || !Constants.expoConfig.extra.eas) {
-      console.error('Project ID bulunamadı!');
+    if (finalStatus !== 'granted') {
+      console.log('Bildirim izni alınamadı!');
       return null;
     }
 
-    // Push token alalım
-    const expoPushToken = await Notifications.getExpoPushTokenAsync({
-      projectId: Constants.expoConfig.extra.eas.projectId,
-    });
-    console.log('Push token:', expoPushToken.data);
-    return expoPushToken.data;
-  } catch (error) {
-    console.error('Token alınırken hata:', error);
-    return null;
+    try {
+      // Expo push token al
+      token = await Notifications.getExpoPushTokenAsync({
+        projectId: Constants.expoConfig?.extra?.eas?.projectId,
+      });
+      
+      console.log('Push token:', token);
+      return token.data;
+    } catch (error) {
+      console.error('Push token alınamadı:', error);
+      return null;
+    }
   }
+
+  return null;
 }
 
 export async function sendTestNotification() {
-  // Önce izin kontrolü yapalım
-  const { status } = await Notifications.getPermissionsAsync();
-  if (status !== 'granted') {
-    console.log('Bildirim izni yok');
-    return;
-  }
+  try {
+    const token = await registerForPushNotificationsAsync();
+    
+    if (!token) {
+      throw new Error('Push token alınamadı');
+    }
 
-  if (!Constants.expoConfig || !Constants.expoConfig.extra || !Constants.expoConfig.extra.eas) {
-    console.error('Project ID bulunamadı!');
-    return null;
+    // Test bildirimi gönder
+    await fetch('https://exp.host/--/api/v2/push/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        to: token,
+        title: 'Asedia',
+        body: 'Test bildirimi başarıyla gönderildi!',
+        data: { type: 'test' },
+        sound: 'default',
+        priority: 'high',
+      }),
+    });
+  } catch (error) {
+    console.error('Test bildirimi gönderilemedi:', error);
+    throw error;
   }
-  
-  // Hemen görüntülenecek bir bildirim planlayalım
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title: "Test Bildirimi 🔔",
-      body: "Bildirimler başarıyla çalışıyor!",
-      sound: true, // Ses etkinleştir
-      priority: Notifications.AndroidNotificationPriority.HIGH,
-    },
-    trigger: null, // Hemen gönder
-  });
-  
-  console.log('Test bildirimi gönderildi!');
 }

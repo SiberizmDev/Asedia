@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Switch, Linking, ActivityIndicator, ScrollView, Image, ImageBackground, SafeAreaView, StatusBar, Alert, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Switch, Linking, ActivityIndicator, ScrollView, Image, ImageBackground, SafeAreaView, StatusBar } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Bell, Moon, Volume2, Clock, ChevronRight, Download, RefreshCw, Sun, Smartphone } from 'lucide-react-native';
 import Icon from 'react-native-vector-icons/FontAwesome'; // FontAwesome ikonları kullanılacak
@@ -13,6 +13,14 @@ import * as Device from 'expo-device';
 
 const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/SiberizmDev/Asedia/main/app.json';
 
+// Güncelleme bilgisi için tip
+type UpdateInfo = {
+  version: string;
+  title: string;
+  description: string[];
+  image: string;
+};
+
 export default function SettingsScreen() {
   const router = useRouter();
   const [notifications, setNotifications] = useState(false);
@@ -21,6 +29,7 @@ export default function SettingsScreen() {
   const [latestVersion, setLatestVersion] = useState('');
   const [isChecking, setIsChecking] = useState(false);
   const currentVersion = Constants.expoConfig?.version || '0.1.0';
+  const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
 
   const { theme, setTheme, colors } = useTheme();
 
@@ -42,112 +51,70 @@ export default function SettingsScreen() {
   }, [notifications]); // notifications değiştiğinde effect'i yeniden çalıştır
 
   const checkForUpdates = async () => {
-    setIsChecking(true);
     try {
-      console.log('Checking for updates...');
-      console.log('Fetching:', GITHUB_RAW_URL);
-      const response = await fetch(GITHUB_RAW_URL);
+      setIsChecking(true);
+      const response = await fetch('https://raw.githubusercontent.com/SiberizmDev/Asedia/main/update.json');
+      
+      if (!response.ok) {
+        console.log('Güncelleme bilgisi alınamadı:', response.status);
+        return;
+      }
+
       const data = await response.json();
-      console.log('Current version:', currentVersion);
-      console.log('GitHub version:', data.expo.version);
-      const githubVersion = data.expo.version;
-      setLatestVersion(githubVersion);
-
-      if (githubVersion > currentVersion) {
-        console.log('Update available!');
+      console.log('Güncelleme verisi:', data);
+      
+      // Versiyon kontrolü
+      if (data.version && data.version !== currentVersion) {
+        console.log('Yeni güncelleme bulundu:', data.version);
+        setUpdateInfo(data);
         setUpdateAvailable(true);
-
-        // Yeni güncelleme varsa ve bildirimler açıksa bildirim gönder
-        if (notifications) {
-          await Notifications.scheduleNotificationAsync({
-            content: {
-              title: "Yeni Güncelleme! 🎉",
-              body: `Asedia ${githubVersion} sürümü yayınlandı! Güncellemeyi unutmayın!`,
-              data: { version: githubVersion },
-            },
-            trigger: null, // Hemen gönder
-          });
-        }
+        setLatestVersion(data.version);
       } else {
-        console.log('No update available');
+        console.log('Güncelleme yok');
         setUpdateAvailable(false);
       }
     } catch (error) {
-      console.error('Error checking for updates:', error);
+      console.log('Güncelleme kontrolü hatası:', error);
     } finally {
       setIsChecking(false);
     }
   };
 
   const checkNotificationPermissions = async () => {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-  
-    // Eğer izin henüz alınmamışsa isteyelim
-    if (existingStatus !== 'granted') {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
-  
-    if (finalStatus !== 'granted') {
-      Alert.alert("Bildirim İzni Gerekli", "Bildirimleri alabilmek için izin vermeniz gerekiyor.");
-      return;
-    }
-  
-    // İzin alındıysa, token al
     const token = await registerForPushNotificationsAsync();
     setNotifications(!!token);
   };
 
   const handleNotificationToggle = async () => {
     if (!notifications) {
-      // Bildirimleri açmaya çalışalım
       try {
-        const { status: existingStatus } = await Notifications.getPermissionsAsync();
-        let finalStatus = existingStatus;
-
-        // İzin yoksa isteyelim
-        if (existingStatus !== 'granted') {
-          const { status } = await Notifications.requestPermissionsAsync();
-          finalStatus = status;
-        }
-
-        if (finalStatus !== 'granted') {
-          Alert.alert("Bildirim İzni Gerekli", "Bildirimleri alabilmek için izin vermeniz gerekiyor.");
-          return;
-        }
-
-        // Push token alıp ayarlayalım
         const token = await registerForPushNotificationsAsync();
+        
         if (token) {
           setNotifications(true);
-          Alert.alert("Başarılı", "Bildirimler başarıyla etkinleştirildi.");
+          Alert.alert(
+            "Başarılı", 
+            "Bildirimler başarıyla etkinleştirildi."
+          );
         } else {
-          Alert.alert("Hata", "Bildirimler etkinleştirilemedi. Lütfen daha sonra tekrar deneyin.");
+          throw new Error('Bildirim izni alınamadı');
         }
-      } catch (error: unknown) {
+      } catch (error) {
         console.error('Bildirim hatası:', error);
-        Alert.alert("Hata", "Bildirimler etkinleştirilemedi: " + (error as Error).message);
+        Alert.alert(
+          "Hata",
+          "Bildirimleri etkinleştirmek için lütfen uygulama ayarlarından izin verin."
+        );
       }
     } else {
-      // Bildirimleri kapatmak için
       Alert.alert(
         "Bildirimleri Kapat",
         "Bildirimleri kapatmak için cihaz ayarlarını kullanmanız gerekiyor.",
         [
-          {
-            text: "İptal",
-            style: "cancel"
-          },
+          { text: "İptal", style: "cancel" },
           {
             text: "Ayarlara Git",
-            onPress: () => {
-              if (Platform.OS === 'ios') {
-                Linking.openURL('app-settings:');
-              } else {
-                Linking.openSettings();
-              }
-            }
+            onPress: () => Linking.openSettings()
           }
         ]
       );
@@ -216,20 +183,52 @@ export default function SettingsScreen() {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <Text style={[styles.title, { color: colors.text }]}>Ayarlar</Text>
 
-        {updateAvailable && (
-          <TouchableOpacity style={[styles.updateBanner, { backgroundColor: colors.cardBackground }]} onPress={handleUpdate}>
+        {updateAvailable && updateInfo && (
+          <TouchableOpacity 
+            style={[styles.updateBanner, { backgroundColor: colors.cardBackground }]}
+            onPress={handleUpdate}
+          >
             <View style={styles.updateContent}>
-              <Download size={24} color={colors.primary} />
-              <View style={styles.updateTextContainer}>
-                <Text style={[styles.updateTitle, { color: colors.primary }]}>Güncelleme Mevcut!</Text>
-                <Text style={[styles.updateText, { color: colors.subText }]}>Yeni versiyon {latestVersion} mevcut</Text>
+              <View style={styles.updateHeader}>
+                <Download size={24} color={colors.primary} />
+                <Text style={[styles.updateTitle, { color: colors.primary }]}>
+                  {updateInfo.title}
+                </Text>
               </View>
+
+              {updateInfo.image && (
+                <Image 
+                  source={{ uri: updateInfo.image }}
+                  style={styles.updateImage}
+                  resizeMode="cover"
+                />
+              )}
+
+              <View style={styles.updateDetails}>
+                <Text style={[styles.updateVersion, { color: colors.text }]}>
+                  Versiyon {updateInfo.version}
+                </Text>
+                <View style={styles.updateFeatures}>
+                  {updateInfo.description.map((item, index) => (
+                    <Text key={index} style={[styles.featureText, { color: colors.text }]}>
+                      • {item}
+                    </Text>
+                  ))}
+                </View>
+              </View>
+
+              <TouchableOpacity 
+                style={[styles.updateButton, { backgroundColor: colors.primary }]}
+                onPress={handleUpdate}
+              >
+                <Text style={styles.updateButtonText}>Güncellemeyi İndir</Text>
+                <ChevronRight size={20} color="#FFFFFF" />
+              </TouchableOpacity>
             </View>
-            <ChevronRight size={24} color={colors.primary} />
           </TouchableOpacity>
         )}
 
-      <View style={styles.section}>
+        <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Görünüm ve Ses</Text>
 
           <TouchableOpacity
@@ -434,27 +433,61 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   updateBanner: {
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 16,
+    padding: 20,
     marginBottom: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   updateContent: {
+    gap: 16,
+  },
+  updateHeader: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 12,
+    marginBottom: 8,
   },
-  updateTextContainer: {
-    marginLeft: 12,
+  updateImage: {
+    width: '100%',
+    height: 160,
+    borderRadius: 12,
   },
   updateTitle: {
-    fontWeight: '600',
-    fontSize: 16,
+    fontSize: 18,
+    fontFamily: 'Inter-SemiBold',
   },
-  updateText: {
+  updateDetails: {
+    gap: 8,
+  },
+  updateVersion: {
+    fontSize: 16,
+    fontFamily: 'Inter-Medium',
+  },
+  updateFeatures: {
+    gap: 6,
+  },
+  featureText: {
     fontSize: 14,
-    marginTop: 2,
+    lineHeight: 20,
+    paddingLeft: 4,
+  },
+  updateButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 12,
+    borderRadius: 12,
+    marginTop: 8,
+    gap: 8,
+  },
+  updateButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontFamily: 'Inter-SemiBold',
   },
   section: {
     marginBottom: 30,

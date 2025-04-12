@@ -27,6 +27,15 @@ export default function TabLayout() {
           ),
         }}
       />
+       <Tabs.Screen
+        name="feel"
+        options={{
+          title: 'Hisset',
+          tabBarIcon: ({ color, size }: { color: string; size: number }) => (
+            <Heart size={size} color={color} />
+          ),
+        }}
+      />
       <Tabs.Screen
         name="relax"
         options={{

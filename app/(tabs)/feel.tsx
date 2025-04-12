@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback,useMemo } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ImageBackground, Modal, Dimensions, PanResponder, Animated, Platform, SafeAreaView, StatusBar } from 'react-native';
 import { Audio } from 'expo-av';
 import { Cloud, Moon, Wind, Star, Music2, BedDouble, Clock, ArrowLeft, Leaf, Tent, Play, Pause, X, Timer } from 'lucide-react-native';
@@ -8,28 +8,6 @@ import { BlurView } from 'expo-blur';
 import { useTheme } from '../context/ThemeContext';
 
 const SOUND_URLS = {
-  rain: require('../../assets/sounds/rain.mp3'),
-  grove: require('../../assets/sounds/grove.mp3'),
-  night: require('../../assets/sounds/night-ambiance.mp3'),
-  wind: require('../../assets/sounds/wind.mp3'),
-  meditation: require('../../assets/sounds/meditation.mp3'),
-  lullaby: require('../../assets/sounds/lullaby.mp3'),
-  dream: require('../../assets/sounds/dream.mp3'),
-  timer: require('../../assets/sounds/timer.mp3'),
-  timer2: require('../../assets/sounds/timer-2.mp3'),
-  memory: require('../../assets/sounds/memory.mp3'),
-  calm: require('../../assets/sounds/bamboo.mp3'),
-  nightsea: require('../../assets/sounds/sea.mp3'),
-  river: require('../../assets/sounds/river.mp3'),
-  campfire: require('../../assets/sounds/campfire.mp3'),
-  campfire2: require('../../assets/sounds/campfire-2.mp3'),
-  campfire3: require('../../assets/sounds/campfire-3.mp3'),
-  winter: require('../../assets/sounds/winter.mp3'),
-  hope: require('../../assets/sounds/hope.mp3'),
-  clouds: require('../../assets/sounds/clouds.mp3'),
-  envcafe: require('../../assets/sounds/envcafe.mp3'),
-  envlib: require('../../assets/sounds/envlib.mp3'),
-
   west: require('../../assets/sounds/west.mp3'),
   scots: require('../../assets/sounds/scots.mp3'),
   texas: require('../../assets/sounds/texas.mp3'),
@@ -56,207 +34,36 @@ interface Category {
 
 const CATEGORIES: Category[] = [
   {
-    title: "Ortam Sesleri",
-    subtitle: "Doğa sesleri",
+    title: "Yöresel",
+    subtitle: "Yörelere özgü müzikler",
     sounds: [
       {
-        id: 'rain',
-        title: 'Yağmurlu Koru',
-        description: 'Yağmurlu bir gün',
-        icon: Cloud,
-        color: '#4CAF50',
-        background: require('../../assets/images/rained_grove.jpeg'),
-        isActive: false
-      },
-      {
-        id: 'grove',
-        title: 'Koru',
-        description: 'Doğanın esintisi',
-        icon: Cloud,
-        color: '#4CAF50',
-        background: require('../../assets/images/grove.jpg'),
-        isActive: false
-      },
-      {
-        id: 'night',
-        title: 'Gece',
-        description: 'Geceniin dinlendirici sesleri',
-        icon: Leaf,
-        color: '#4CAF50',
-        background: require('../../assets/images/night.jpg'),
-        isActive: false
-      },
-      {
-        id: 'campfire',
-        title: 'Şömine',
-        description: 'Kamp ateşinin çıtırtısı',
-        icon: Tent,
-        color: '#FF5722',
-        background: require('../../assets/images/campfire.jpg'),
-        isActive: false
-      },
-      {
-        id: 'campfire2',
-        title: 'Şömine 2',
-        description: 'Kamp ateşinin çıtırtısı',
-        icon: Tent,
-        color: '#FF5722',
-        background: require('../../assets/images/campfire-2.jpg'),
-        isActive: false
-      },
-      {
-        id: 'campfire3',
-        title: 'Şömine 3',
-        description: 'Kamp ateşinin çıtırtısı',
-        icon: Tent,
-        color: '#FF5722',
-        background: require('../../assets/images/campfire-3.jpg'),
-        isActive: false
-      },
-      {
-        id: 'nightsea',
-        title: 'Okyanus Esintisi',
-        description: 'Okyanusun sessiz sessizliği',
-        icon: Tent,
-        color: '#FF5722',
-        background: require('../../assets/images/ocean.jpg'),
-        isActive: false
-      },
-      {
-        id: 'river',
-        title: 'Gece Nehri',
-        description: 'Akarsuyun uyandırıcı sesi',
-        icon: Tent,
-        color: '#FF5722',
-        background: require('../../assets/images/default.jpg'),
-        isActive: false
-      }
-    ]
-  },
-  {
-    title: "Sakinleş",
-    subtitle: "Ruha dokunan melodiler",
-    sounds: [
-      {
-        id: 'memory',
-        title: 'Hatıra',
-        description: 'Hatıralarınıza dalın',
+        id: 'west',
+        title: 'Batı',
+        description: 'Vahşi "olmayan" Batı',
         icon: Star,
         color: '#9C27B0',
-        background: require('../../assets/images/memory.jpeg'),
+        background: require('../../assets/images/west.png'),
         isActive: false
       },
       {
-        id: 'winter',
-        title: 'Kış',
-        description: 'Kış | by TOSH',
+        id: 'texas',
+        title: 'Teksas',
+        description: 'Teksasın güzel yanı',
         icon: Music2,
         color: '#2196F3',
-        background: require('../../assets/images/winter.jpeg'),
+        background: require('../../assets/images/texas.png'),
         isActive: false
       },
       {
-        id: 'hope',
-        title: 'Umut',
-        description: 'Umudunuzu canlandırın',
+        id: 'scots',
+        title: 'İskoçya',
+        description: 'İskoçların gaydası',
         icon: Music2,
         color: '#2196F3',
-        background: require('../../assets/images/hope.jpeg'),
+        background: require('../../assets/images/scots.png'),
         isActive: false
-      },
-      {
-        id: 'clouds',
-        title: 'Bulutlar',
-        description: 'Bulutlar | by TOSH',
-        icon: Music2,
-        color: '#2196F3',
-        background: require('../../assets/images/clouds.jpg'),
-        isActive: false
-      },
-      // {
-      //   id: 'night',
-      //   title: 'Ay ışığı',
-      //   description: 'Sakin gece melodileri',
-      //   icon: Moon,
-      //   color: '#607D8B',
-      //   background: require('../../assets/images/night.jpg'),
-      //   isActive: false
-      // },
-    ]
-  },
-  {
-    title: "Odaklan",
-    subtitle: "Odaklanmanıza yardımcı olacak sesler",
-    sounds: [
-      {
-        id: 'timer',
-        title: 'Saat Tıkırtısı',
-        description: 'Geçen sürenin farkına varın',
-        icon: Wind,
-        color: '#9E9E9E',
-        background: require('../../assets/images/clock.jpg'),
-        isActive: false
-      },
-      {
-        id: 'timer2',
-        title: 'Saat Tıkırtısı 2',
-        description: 'Geçen sürenin farkına varın',
-        icon: Wind,
-        color: '#E91E63',
-        background: require('../../assets/images/clock2.jpg'),
-        isActive: false
-      },
-      {
-        id: 'envcafe',
-        title: 'Ortam (Kafe)',
-        description: 'Kafe ortamında çalışın',
-        icon: Wind,
-        color: '#795548',
-        background: require('../../assets/images/cafe.jpg'),
-        isActive: false
-      },
-      {
-        id: 'envlib',
-        title: 'Ortam (Kütüphane)',
-        description: 'Kütüphane ortamında çalışın',
-        icon: Wind,
-        color: '#795548',
-        background: require('../../assets/images/library.jpg'),
-        isActive: false
-      },
-    ]
-  },
-  {
-    title: "Renkli gürültü",
-    subtitle: "Seslerin dijital dünyasına dalın",
-    sounds: [
-      {
-        id: 'meditation',
-        title: 'Meditasyon',
-        description: 'Meditasyon frekanslı ses',
-        icon: Wind,
-        color: '#9E9E9E',
-        background: require('../../assets/images/meditation.jpg'),
-        isActive: false
-      },
-      {
-        id: 'lullaby',
-        title: 'Ninni',
-        description: 'Yumuşak frekans sesi',
-        icon: Wind,
-        color: '#E91E63',
-        background: require('../../assets/images/lullaby.jpg'),
-        isActive: false
-      },
-      {
-        id: 'dream',
-        title: 'Rüya',
-        description: 'Derin frekans sesi',
-        icon: Wind,
-        color: '#795548',
-        background: require('../../assets/images/dream.jpg'),
-        isActive: false
-      },
+      }
     ]
   }
 ];
@@ -512,7 +319,7 @@ export default function SleepScreen() {
       />
       <View style={styles.container}>
         <ImageBackground
-          source={activeSound?.background || require('../../assets/images/night.jpg')}
+          source={activeSound?.background || require('../../assets/images/karadeniz.png')}
           style={StyleSheet.absoluteFill}
           blurRadius={theme === 'light' ? 60 : 80}
         >
@@ -708,11 +515,9 @@ export default function SleepScreen() {
                 source={selectedSound.background}
                 style={StyleSheet.absoluteFill}
               >
-                <BlurView intensity={theme === 'light' ? 40 : 20} tint={theme === 'light' ? 'light' : 'dark'} style={StyleSheet.absoluteFill} />
+                <BlurView intensity={20} style={StyleSheet.absoluteFill} />
                 <LinearGradient
-                  colors={theme === 'light' 
-                    ? ['rgba(255,255,255,0.3)', 'rgba(255,255,255,0.8)']
-                    : ['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.8)']}
+                  colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.8)']}
                   style={styles.modalOverlay}
                 >
                   <TouchableOpacity

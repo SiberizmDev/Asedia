@@ -2,7 +2,7 @@
   "expo": {
     "name": "Asedia",
     "slug": "asedia",
-    "version": "1.4.3",
+    "version": "1.5.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "asedia",
@@ -24,13 +24,15 @@
         "foregroundImage": "./assets/notification-icon.png",
         "backgroundColor": "#101013"
       },
-      "versionCode": 1,
+      "versionCode": 3,
       "permissions": [
         "INTERNET",
         "ACCESS_NETWORK_STATE",
         "RECEIVE_BOOT_COMPLETED",
         "VIBRATE",
-        "POST_NOTIFICATIONS"
+        "POST_NOTIFICATIONS",
+         "REQUEST_INSTALL_PACKAGES",
+        "WRITE_EXTERNAL_STORAGE"
       ],
       "useNextNotificationsApi": true,
       "softwareKeyboardLayoutMode": "pan",
@@ -50,7 +52,12 @@
       [
         "expo-notifications",
         {
-          "color": "#ffffff"
+          "icon": "./assets/notification-icon.png",
+          "color": "#ffffff",
+          "sounds": ["./assets/notification.wav"],
+          "androidMode": "default",
+          "androidCollapsedTitle": "Asedia",
+          "iosDisplayInForeground": true
         }
       ]
     ],
@@ -65,13 +72,12 @@
         "projectId": "73b063a3-1c70-4291-9653-2a51150c88e5"
       }
     },
-    "expo": {
-      "notification": {
-        "icon": "./assets/icon.png",
-        "color": "#000000",
-        "androidMode": "default",
-        "androidCollapsedTitle": "Yeni Bildirim"
-      }
+    "notification": {
+      "icon": "./assets/notification-icon.png",
+      "color": "#ffffff",
+      "androidMode": "default",
+      "androidCollapsedTitle": "Asedia",
+      "iosDisplayInForeground": true
     }
   }
 }
