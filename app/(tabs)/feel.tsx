@@ -11,7 +11,7 @@ const SOUND_URLS = {
   west: require('../../assets/sounds/west.mp3'),
   scots: require('../../assets/sounds/scots.mp3'),
   texas: require('../../assets/sounds/texas.mp3'),
-  
+  karadeniz: require('../../assets/sounds/karadeniz.mp3'),
 } as const;
 
 type SoundId = keyof typeof SOUND_URLS;
@@ -62,6 +62,21 @@ const CATEGORIES: Category[] = [
         icon: Music2,
         color: '#2196F3',
         background: require('../../assets/images/scots.png'),
+        isActive: false
+      }
+    ]
+  },
+  {
+    title: "Türkiye",
+    subtitle: "Türkiye'nin yöreleri",
+    sounds: [
+      {
+        id: 'karadeniz',
+        title: 'Hemşin',
+        description: 'Karadenizin güzel yanı',
+        icon: Star,
+        color: '#9C27B0',
+        background: require('../../assets/images/karadeniz.png'),
         isActive: false
       }
     ]

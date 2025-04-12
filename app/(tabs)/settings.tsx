@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Switch, Linking, ActivityIndicator, ScrollView, Image, ImageBackground, SafeAreaView, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Switch, Linking, ActivityIndicator, ScrollView, Image, ImageBackground, SafeAreaView, StatusBar, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Bell, Moon, Volume2, Clock, ChevronRight, Download, RefreshCw, Sun, Smartphone } from 'lucide-react-native';
 import Icon from 'react-native-vector-icons/FontAwesome'; // FontAwesome ikonları kullanılacak
@@ -305,20 +305,20 @@ export default function SettingsScreen() {
 
           <TouchableOpacity
             style={[styles.settingItem, { borderBottomColor: colors.border }]}
-            onPress={() => handlePress('https://forum.asena.space/')}
+            onPress={() => handlePress('https://www.instagram.com/piijamali_spiderman/')}
           >
-          <View style={styles.settingLeft}>
-              {/* Icon image */}
+            <View style={styles.settingLeft}>
               <Image
-                source={require('../../assets/images/forum.png')} // resmin doğru yolunu belirtin
-                style={{ width: 24, height: 24, marginRight: 10 }} // İkon boyutu
+                source={require('../../assets/images/ask.jpg')}
+                style={{ width: 24, height: 24, marginRight: 10 }}
               />
               <View style={styles.settingTextContainer}>
-                <Text style={[styles.settingText, { color: colors.text }]}>Asena Forum</Text>
+                <Text style={[styles.settingText, { color: colors.text }]}>Ayaz Salih Koç Instagram</Text>
               </View>
-          </View>
+            </View>
             <ChevronRight size={24} color={colors.text} />
-        </TouchableOpacity>
+          </TouchableOpacity>
+        </View>
 
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Bize Ulaşın</Text>
@@ -327,40 +327,38 @@ export default function SettingsScreen() {
             style={[styles.settingItem, { borderBottomColor: colors.border }]}
             onPress={() => handlePress('https://forum.asena.space/')}
           >
-          <View style={styles.settingLeft}>
-              {/* Icon image */}
+            <View style={styles.settingLeft}>
               <Image
-                source={require('../../assets/images/ask.jpg')} // resmin doğru yolunu belirtin
-                style={{ width: 24, height: 24, marginRight: 10 }} // İkon boyutu
+                source={require('../../assets/images/forum.png')}
+                style={{ width: 24, height: 24, marginRight: 10 }}
               />
               <View style={styles.settingTextContainer}>
                 <Text style={[styles.settingText, { color: colors.text }]}>Asena Forum</Text>
               </View>
-          </View>
+            </View>
             <ChevronRight size={24} color={colors.text} />
-        </TouchableOpacity>
+          </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.settingItem, { borderBottomColor: colors.border }]}
-            onPress={() => handlePress('https://www.instagram.com/piijamali_spiderman/')} // Instagram profil linkini buraya ekleyin
+            onPress={() => handlePress('https://www.instagram.com/asena.space/')}
           >
-          <View style={styles.settingLeft}>
-              {/* Instagram İkonu */}
+            <View style={styles.settingLeft}>
               <Icon
-                name="instagram" // FontAwesome'dan Instagram ikonu
-                size={24} // İkon boyutu
-                color={colors.text} // İkon rengi
-                style={{ marginRight: 10 }} // Sağ boşluk
+                name="instagram"
+                size={24}
+                color={colors.text}
+                style={{ marginRight: 10 }}
               />
               <View style={styles.settingTextContainer}>
-                <Text style={[styles.settingText, { color: colors.text }]}>@piijamali_spiderman</Text>
+                <Text style={[styles.settingText, { color: colors.text }]}>@asena.space</Text>
               </View>
-          </View>
+            </View>
             <ChevronRight size={24} color={colors.text} />
-        </TouchableOpacity>
-      </View>
+          </TouchableOpacity>
+        </View>
 
-      <View style={styles.section}>
+        <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Hakkında</Text>
 
           <TouchableOpacity style={[styles.settingItem, { borderBottomColor: colors.border }]}
@@ -381,7 +379,7 @@ export default function SettingsScreen() {
               </View>
             </View>
             <ChevronRight size={24} color={colors.text} />
-        </TouchableOpacity>
+          </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.settingItem, styles.updateCheck, { borderBottomColor: colors.border }]}
@@ -402,7 +400,7 @@ export default function SettingsScreen() {
             ) : (
               <ChevronRight size={24} color={colors.text} />
             )}
-        </TouchableOpacity>
+          </TouchableOpacity>
 
           <View style={[styles.settingItem, { borderBottomColor: colors.border }]}>
             <Text style={[styles.settingText, { color: colors.text }]}>Versiyon {currentVersion}</Text>
@@ -413,14 +411,14 @@ export default function SettingsScreen() {
         </View>
 
         {notifications && (
-          < View style={styles.section}>
+          <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Test Bildirimi</Text>
             <TouchableOpacity
               style={[
                 styles.option,
                 {
                   backgroundColor: colors.cardBackground,
-                  opacity: notifications ? 1 : 0.5 // Bildirimler kapalıysa görsel geri bildirim
+                  opacity: notifications ? 1 : 0.5
                 }
               ]}
               onPress={notifications ? handleTestNotification : handleNotificationToggle}
@@ -430,11 +428,11 @@ export default function SettingsScreen() {
                 {notifications ? 'Cihaza Test Bildirimi Gönder' : 'Bildirim İzni Gerekli'}
               </Text>
               <Bell size={20} color={colors.text} />
-        </TouchableOpacity>
-      </View>
+            </TouchableOpacity>
+          </View>
         )}
       </ScrollView>
-    </SafeAreaView >
+    </SafeAreaView>
   );
 }
 
