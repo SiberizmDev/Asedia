@@ -34,6 +34,17 @@
           "soundUrl": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/sounds/night-ambiance.mp3",
           "isActive": false
         },
+
+ {
+          "id": "night3",
+          "title": "Gece",
+          "description": "Gecenin dinlendirici sesleri",
+          "icon": "Moon",
+          "color": "#4CAF50",
+          "background": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/night.jpg",
+          "soundUrl": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/sounds/night-ambiance.mp3",
+          "isActive": false
+        },
         {
           "id": "campfire",
           "title": "Şömine",
