@@ -1,0 +1,220 @@
+{
+  "categories": [
+    {
+      "title": "Ortam Sesleri",
+      "subtitle": "Doğa sesleri",
+      "sounds": [
+        {
+          "id": "rain",
+          "title": "Yağmurlu Koru",
+          "description": "Yağmurlu bir gün",
+          "icon": "Cloud",
+          "color": "#4CAF50",
+          "background": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/rained_grove.jpeg",
+          "soundUrl": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/sounds/rain.mp3",
+          "isActive": false
+        },
+        {
+          "id": "grove",
+          "title": "Koru",
+          "description": "Doğanın esintisi",
+          "icon": "Cloud",
+          "color": "#4CAF50",
+          "background": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/grove.jpg",
+          "soundUrl": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/sounds/grove.mp3",
+          "isActive": false
+        },
+        {
+          "id": "night",
+          "title": "Gece",
+          "description": "Gecenin dinlendirici sesleri",
+          "icon": "Leaf",
+          "color": "#4CAF50",
+          "background": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/night.jpg",
+          "soundUrl": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/sounds/night-ambiance.mp3",
+          "isActive": false
+        },
+        {
+          "id": "campfire",
+          "title": "Şömine",
+          "description": "Kamp ateşinin çıtırtısı",
+          "icon": "Tent",
+          "color": "#FF5722",
+          "background": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/campfire.jpg",
+          "soundUrl": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/sounds/campfire.mp3",
+          "isActive": false
+        },
+        {
+          "id": "campfire2",
+          "title": "Şömine 2",
+          "description": "Kamp ateşinin çıtırtısı",
+          "icon": "Tent",
+          "color": "#FF5722",
+          "background": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/campfire-2.jpg",
+          "soundUrl": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/sounds/campfire-2.mp3",
+          "isActive": false
+        },
+        {
+          "id": "campfire3",
+          "title": "Şömine 3",
+          "description": "Kamp ateşinin çıtırtısı",
+          "icon": "Tent",
+          "color": "#FF5722",
+          "background": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/campfire-3.jpg",
+          "soundUrl": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/sounds/campfire-3.mp3",
+          "isActive": false
+        },
+        {
+          "id": "nightsea",
+          "title": "Okyanus Esintisi",
+          "description": "Okyanusun sessiz sessizliği",
+          "icon": "Tent",
+          "color": "#FF5722",
+          "background": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/ocean.jpg",
+          "soundUrl": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/sounds/sea.mp3",
+          "isActive": false
+        },
+        {
+          "id": "river",
+          "title": "Gece Nehri",
+          "description": "Akarsuyun uyandırıcı sesi",
+          "icon": "Tent",
+          "color": "#FF5722",
+          "background": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/default.jpg",
+          "soundUrl": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/sounds/river.mp3",
+          "isActive": false
+        }
+      ]
+    },
+    {
+      "title": "Sakinleş",
+      "subtitle": "Ruha dokunan melodiler",
+      "sounds": [
+        {
+          "id": "memory",
+          "title": "Hatıra",
+          "description": "Hatıralarınıza dalın",
+          "icon": "Star",
+          "color": "#9C27B0",
+          "background": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/memory.jpeg",
+          "soundUrl": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/sounds/memory.mp3",
+          "isActive": false
+        },
+        {
+          "id": "winter",
+          "title": "Kış",
+          "description": "Kış | by TOSH",
+          "icon": "Music2",
+          "color": "#2196F3",
+          "background": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/winter.jpeg",
+          "soundUrl": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/sounds/winter.mp3",
+          "isActive": false
+        },
+        {
+          "id": "hope",
+          "title": "Umut",
+          "description": "Umudunuzu canlandırın",
+          "icon": "Music2",
+          "color": "#2196F3",
+          "background": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/hope.jpeg",
+          "soundUrl": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/sounds/hope.mp3",
+          "isActive": false
+        },
+        {
+          "id": "clouds",
+          "title": "Bulutlar",
+          "description": "Bulutlar | by TOSH",
+          "icon": "Music2",
+          "color": "#2196F3",
+          "background": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/clouds.jpg",
+          "soundUrl": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/sounds/clouds.mp3",
+          "isActive": false
+        }
+      ]
+    },
+    {
+      "title": "Odaklan",
+      "subtitle": "Odaklanmanıza yardımcı olacak sesler",
+      "sounds": [
+        {
+          "id": "timer",
+          "title": "Saat Tıkırtısı",
+          "description": "Geçen sürenin farkına varın",
+          "icon": "Wind",
+          "color": "#9E9E9E",
+          "background": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/clock.jpg",
+          "soundUrl": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/sounds/timer.mp3",
+          "isActive": false
+        },
+        {
+          "id": "timer2",
+          "title": "Saat Tıkırtısı 2",
+          "description": "Geçen sürenin farkına varın",
+          "icon": "Wind",
+          "color": "#E91E63",
+          "background": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/clock2.jpg",
+          "soundUrl": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/sounds/timer-2.mp3",
+          "isActive": false
+        },
+        {
+          "id": "envcafe",
+          "title": "Ortam (Kafe)",
+          "description": "Kafe ortamında çalışın",
+          "icon": "Wind",
+          "color": "#795548",
+          "background": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/cafe.jpg",
+          "soundUrl": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/sounds/envcafe.mp3",
+          "isActive": false
+        },
+        {
+          "id": "envlib",
+          "title": "Ortam (Kütüphane)",
+          "description": "Kütüphane ortamında çalışın",
+          "icon": "Wind",
+          "color": "#795548",
+          "background": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/library.jpg",
+          "soundUrl": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/sounds/envlib.mp3",
+          "isActive": false
+        }
+      ]
+    },
+    {
+      "title": "Renkli gürültü",
+      "subtitle": "Seslerin dijital dünyasına dalın",
+      "sounds": [
+        {
+          "id": "meditation",
+          "title": "Meditasyon",
+          "description": "Meditasyon frekanslı ses",
+          "icon": "Wind",
+          "color": "#9E9E9E",
+          "background": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/meditation.jpg",
+          "soundUrl": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/sounds/meditation.mp3",
+          "isActive": false
+        },
+        {
+          "id": "lullaby",
+          "title": "Ninni",
+          "description": "Yumuşak frekans sesi",
+          "icon": "Wind",
+          "color": "#E91E63",
+          "background": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/lullaby.jpg",
+          "soundUrl": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/sounds/lullaby.mp3",
+          "isActive": false
+        },
+        {
+          "id": "dream",
+          "title": "Rüya",
+          "description": "Derin frekans sesi",
+          "icon": "Wind",
+          "color": "#795548",
+          "background": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/dream.jpg",
+          "soundUrl": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/sounds/dream.mp3",
+          "isActive": false
+        }
+      ]
+    }
+  ],
+  "version": "1.0.0",
+  "lastUpdated": "2024-03-19"
+}
