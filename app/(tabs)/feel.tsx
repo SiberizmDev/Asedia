@@ -11,6 +11,8 @@ const SOUND_URLS = {
   west: require('../../assets/sounds/west.mp3'),
   scots: require('../../assets/sounds/scots.mp3'),
   texas: require('../../assets/sounds/texas.mp3'),
+  country: require('../../assets/sounds/country.mp3'),
+  hemsin: require('../../assets/sounds/hemsin.mp3'),
   karadeniz: require('../../assets/sounds/karadeniz.mp3'),
   ask: require('../../assets/sounds/ask.mp3'),
 } as const;
@@ -64,6 +66,15 @@ const CATEGORIES: Category[] = [
         color: '#2196F3',
         background: require('../../assets/images/scots.png'),
         isActive: false
+      },
+      {
+        id: 'country',
+        title: 'Taşra',
+        description: 'Huzur verici taşra',
+        icon: Music2,
+        color: '#2196F3',
+        background: require('../../assets/images/country.jpeg'),
+        isActive: false
       }
     ]
   },
@@ -72,12 +83,21 @@ const CATEGORIES: Category[] = [
     subtitle: "Türkiye'nin yöreleri",
     sounds: [
       {
-        id: 'karadeniz',
+        id: 'hemsin',
         title: 'Hemşin',
         description: 'Karadenizin güzel yanı',
         icon: Star,
         color: '#9C27B0',
-        background: require('../../assets/images/karadeniz.png'),
+        background: require('../../assets/images/hemsin.png'),
+        isActive: false
+      },
+      {
+        id: 'karadeniz',
+        title: 'Karadeniz',
+        description: 'Karadenizin güzel yanı',
+        icon: Star,
+        color: '#9C27B0',
+        background: require('../../assets/images/karadeniz.jpeg'),
         isActive: false
       }
     ]
@@ -343,22 +363,22 @@ export default function SleepScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: 'transparent' }]}>
-      <StatusBar 
-        barStyle={theme === 'light' ? 'dark-content' : 'light-content'} 
-        backgroundColor="transparent" 
-        translucent 
+      <StatusBar
+        barStyle={theme === 'light' ? 'dark-content' : 'light-content'}
+        backgroundColor="transparent"
+        translucent
       />
       <View style={styles.container}>
         <ImageBackground
-          source={activeSound?.background || require('../../assets/images/karadeniz.png')}
+          source={activeSound?.background || require('../../assets/images/karadeniz.jpeg')}
           style={StyleSheet.absoluteFill}
           blurRadius={theme === 'light' ? 60 : 80}
         >
           <View style={[
-            StyleSheet.absoluteFill, 
-            { 
-              backgroundColor: theme === 'light' 
-                ? 'rgba(255, 255, 255, 0.3)' 
+            StyleSheet.absoluteFill,
+            {
+              backgroundColor: theme === 'light'
+                ? 'rgba(255, 255, 255, 0.3)'
                 : theme === 'amoled'
                   ? 'rgba(0, 0, 0, 0.8)'
                   : 'rgba(0, 0, 0, 0.7)'
@@ -439,17 +459,17 @@ export default function SleepScreen() {
                 style={StyleSheet.absoluteFill}
                 blurRadius={25}
               >
-                <BlurView 
-                  intensity={theme === 'light' ? 60 : 80} 
-                  tint={theme === 'light' ? 'light' : 'dark'} 
+                <BlurView
+                  intensity={theme === 'light' ? 60 : 80}
+                  tint={theme === 'light' ? 'light' : 'dark'}
                   style={StyleSheet.absoluteFill}
                 >
                   <View style={[
-                    StyleSheet.absoluteFill, 
-                    { 
-                      backgroundColor: theme === 'light' 
-                        ? 'rgba(255, 255, 255, 0.2)' 
-                        : 'rgba(0, 0, 0, 0.3)' 
+                    StyleSheet.absoluteFill,
+                    {
+                      backgroundColor: theme === 'light'
+                        ? 'rgba(255, 255, 255, 0.2)'
+                        : 'rgba(0, 0, 0, 0.3)'
                     }
                   ]} />
                 </BlurView>

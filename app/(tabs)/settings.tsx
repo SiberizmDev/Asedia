@@ -51,15 +51,7 @@ export default function SettingsScreen() {
   useEffect(() => {
     checkForUpdates();
     checkNotificationPermissions();
-
-    // Her 6 saatte bir güncelleme kontrolü yap
-    const updateCheckInterval = setInterval(() => {
-      checkForUpdates();
-    }, 6 * 60 * 60 * 1000); // 6 saat = 6 * 60 * 60 * 1000 milisaniye
-
-    // Component unmount olduğunda interval'i temizle
-    return () => clearInterval(updateCheckInterval);
-  }, [notifications]); // notifications değiştiğinde effect'i yeniden çalıştır
+  }, []); // Sadece component mount olduğunda çalışsın
 
   const checkForUpdates = async () => {
     try {

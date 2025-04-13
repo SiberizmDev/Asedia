@@ -2,7 +2,7 @@
   "expo": {
     "name": "Asedia",
     "slug": "asedia",
-    "version": "1.6.3", 
+    "version": "1.6.4", 
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "asedia",
@@ -27,7 +27,7 @@
     "android": {
       "package": "com.asena.space",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/notification-icon.png",
+        "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#101013"
       },
       "versionCode": 3,
