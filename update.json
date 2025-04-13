@@ -7,5 +7,10 @@
     "Hisset sayfasına yeni A.S.K. Special müziği eklendi",
     "Ayaz Salih Koç'a teşekkürlerimizi ve desteğimizi sunuyoruz"
   ],
+  "versionName": "A.S.K. Special",
+  "icon": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/icon.png",
+  "updateImage": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/update.png",
+  "updateNotes": [...],
+  "downloadUrl": "..."
   "image": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/update.png"
 }
