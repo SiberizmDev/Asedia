@@ -14,7 +14,9 @@ const SOUND_URLS = {
   country: require('../../assets/sounds/country.mp3'),
   hemsin: require('../../assets/sounds/hemsin.mp3'),
   karadeniz: require('../../assets/sounds/karadeniz.mp3'),
+  tulum: require('../../assets/sounds/tulum.mp3'),
   ask: require('../../assets/sounds/ask.mp3'),
+  outlast: require('../../assets/sounds/outlast.mp3'),
 } as const;
 
 type SoundId = keyof typeof SOUND_URLS;
@@ -99,6 +101,15 @@ const CATEGORIES: Category[] = [
         color: '#9C27B0',
         background: require('../../assets/images/karadeniz.jpeg'),
         isActive: false
+      },
+      {
+        id: 'tulum',
+        title: 'Tulum',
+        description: 'Tulum derin sesi',
+        icon: Star,
+        color: '#9C27B0',
+        background: require('../../assets/images/tulum.png'),
+        isActive: false
       }
     ]
   },
@@ -113,6 +124,21 @@ const CATEGORIES: Category[] = [
         icon: Star,
         color: '#9C27B0',
         background: require('../../assets/images/ask_bg.jpg'),
+        isActive: false
+      }
+    ]
+  },
+  {
+    title: "0'lar ve 1'ler",
+    subtitle: "Dijital dünyadan sesler",
+    sounds: [
+      {
+        id: 'outlast',
+        title: 'Outlast',
+        description: 'Korkunç evrenın sıcak ambiyansı',
+        icon: Star,
+        color: '#9C27B0',
+        background: require('../../assets/images/outlast.png'),
         isActive: false
       }
     ]

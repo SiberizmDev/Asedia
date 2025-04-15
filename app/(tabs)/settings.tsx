@@ -14,12 +14,12 @@ import * as Device from 'expo-device';
 const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/SiberizmDev/Asedia/main/app.json';
 
 // Güncelleme bilgisi için tip
-type UpdateInfo = {
+interface UpdateInfo {
   version: string;
   title: string;
   description: string[];
-  image: string;
-};
+  image: string | null;
+}
 
 // Bildirim ayarlarını yapılandır
 Notifications.setNotificationHandler({
@@ -56,38 +56,69 @@ export default function SettingsScreen() {
   const checkForUpdates = async () => {
     try {
       setIsChecking(true);
-      const response = await fetch('https://raw.githubusercontent.com/SiberizmDev/Asedia/main/update.json', {
-        cache: 'no-store',
-        headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
-        }
-      });
-      
-      if (!response.ok) {
-        console.log('Güncelleme bilgisi alınamadı:', response.status);
-        return;
-      }
+      console.log('Güncelleme kontrolü başlatılıyor...');
 
-      const data = await response.json();
-      console.log('Güncelleme verisi:', data);
-      
+      // app.json'dan versiyon kontrolü
+      const appResponse = await fetch(GITHUB_RAW_URL);
+      if (!appResponse.ok) {
+        throw new Error('app.json alınamadı');
+      }
+      const appData = await appResponse.json();
+      const remoteVersion = appData.expo.version;
+      console.log('Uzak versiyon:', remoteVersion);
+      console.log('Mevcut versiyon:', currentVersion);
+
       // Versiyon kontrolü
-      if (data.version && data.version !== currentVersion) {
-        console.log('Yeni güncelleme bulundu:', data.version);
-        // Resim URL'sine timestamp ekle
-        if (data.image) {
-          data.image = `${data.image}?t=${new Date().getTime()}`;
+      if (remoteVersion !== currentVersion) {
+        let updateInfo: UpdateInfo;
+        
+        try {
+          // update.json'dan güncelleme içeriğini al
+          const response = await fetch('https://raw.githubusercontent.com/SiberizmDev/Asedia/main/update.json');
+          if (!response.ok) {
+            throw new Error('update.json alınamadı');
+          }
+          const text = await response.text(); // Önce text olarak al
+          console.log('Update.json içeriği:', text); // İçeriği logla
+          const data = JSON.parse(text); // Sonra parse et
+
+          updateInfo = {
+            version: remoteVersion,
+            title: data.title || 'Yeni Güncelleme',
+            description: data.description || ['Yeni özellikler ve iyileştirmeler'],
+            image: data.updateImage || data.image || null
+          };
+        } catch (updateError) {
+          console.error('Update.json parse hatası:', updateError);
+          // Update.json alınamazsa basit bir güncelleme bilgisi göster
+          updateInfo = {
+            version: remoteVersion,
+            title: 'Yeni Güncelleme',
+            description: ['Yeni özellikler ve iyileştirmeler'],
+            image: null
+          };
         }
-        setUpdateInfo(data);
+
+        setUpdateInfo(updateInfo);
         setUpdateAvailable(true);
-        setLatestVersion(data.version);
+        setLatestVersion(remoteVersion);
       } else {
-        console.log('Güncelleme yok');
         setUpdateAvailable(false);
+        setLatestVersion(currentVersion);
       }
     } catch (error) {
-      console.log('Güncelleme kontrolü hatası:', error);
+      console.error('Güncelleme kontrolü hatası:', error);
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        Alert.alert(
+          'Bağlantı Hatası',
+          'Güncelleme bilgisi alınamadı. Lütfen internet bağlantınızı kontrol edip tekrar deneyin.'
+        );
+      } else {
+        Alert.alert(
+          'Hata',
+          'Güncelleme kontrolü sırasında bir hata oluştu. Lütfen daha sonra tekrar deneyin.'
+        );
+      }
     } finally {
       setIsChecking(false);
     }
