@@ -211,6 +211,15 @@
           "background": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/dream.jpg",
           "soundUrl": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/sounds/dream.mp3",
           "isActive": false
+        }   {
+          "id": "dream",
+          "title": "Gizemli",
+          "description": "Derin frekans sesi",
+          "icon": "Moon",
+          "color": "#795548",
+          "background": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/dream.jpg",
+          "soundUrl": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/sounds/mystery.mp3",
+          "isActive": false
         }
       ]
     }
