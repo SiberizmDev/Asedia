@@ -2,7 +2,7 @@
   "expo": {
     "name": "Asedia",
     "slug": "asedia",
-    "version": "1.6.5", 
+    "version": "06.02.23", 
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "asedia",

@@ -1,17 +1,11 @@
 {
-  "version": "1.6.5 (A.S.K. Special)",
-  "title": "A.S.K. Sürüm Serisi",
+  "version": "1.6.6 (A.S.K. Special)",
+  "title": "A.S.K. Special Sürümü",
   "description": [
-    "Yerli Spiderman Ayaz Salih Koç Özel Sürümü. v1.6 sürümü Ayaz Salih Koç'a adanmıştır.",
+    "Yerli Spiderman Ayaz Salih Koç Özel Sürümü",
     "Bizim desteğimize ihtiyacı olan Yerli Spiderman adı ile tanınan Ayaz Salih Koç'a destek niteliğinde çıkarılan özel bir sürüm",
-    "Hisset sayfasına yeni Tulum müziği eklendi",
-    "Hisset sayfasına yeni 0'lar ve 1'ler kategorisi eklendi",
+    "Hata düzeltmeleri ve iyiletirmeler",
     "Ayaz Salih Koç'a teşekkürlerimizi ve desteğimizi sunuyoruz"
   ],
-  "versionName": "A.S.K. Special",
-  "icon": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/icon.png",
-  "updateImage": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/update.png",
-  "updateNotes": [],
-  "downloadUrl": "...",
   "image": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/update.png"
 }

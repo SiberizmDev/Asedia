@@ -17,6 +17,7 @@ const SOUND_URLS = {
   tulum: require('../../assets/sounds/tulum.mp3'),
   ask: require('../../assets/sounds/ask.mp3'),
   outlast: require('../../assets/sounds/outlast.mp3'),
+  nostalgia: require('../../assets/sounds/mystery.mp3'),
 } as const;
 
 type SoundId = keyof typeof SOUND_URLS;
@@ -139,6 +140,15 @@ const CATEGORIES: Category[] = [
         icon: Star,
         color: '#9C27B0',
         background: require('../../assets/images/outlast.png'),
+        isActive: false
+      },
+      {
+        id: 'nostalgia',
+        title: 'Nostalji',
+        description: 'Tanımlanamayan nostalji',
+        icon: Star,
+        color: '#9C27B0',
+        background: require('../../assets/images/nostalgia.jpg'),
         isActive: false
       }
     ]
