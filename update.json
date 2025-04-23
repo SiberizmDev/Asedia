@@ -1,10 +1,8 @@
 {
-  "version": "1.6.6 (A.S.K. Special)",
-  "title": "A.S.K. Special Sürümü",
+  "version": "1.7.0 ESİNTİ",
+  "title": "Esinti Güncellemesi",
   "description": [
-    "Yerli Spiderman Ayaz Salih Koç Özel Sürümü",
-    "Bizim desteğimize ihtiyacı olan Yerli Spiderman adı ile tanınan Ayaz Salih Koç'a destek niteliğinde çıkarılan özel bir sürüm",
-    "Hata düzeltmeleri ve iyiletirmeler",
+    "Asedia Artık Android 15 sürümünü destekliyor!",
     "Ayaz Salih Koç'a teşekkürlerimizi ve desteğimizi sunuyoruz"
   ],
   "image": "https://raw.githubusercontent.com/SiberizmDev/Asedia/main/assets/images/update.png"
