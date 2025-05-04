@@ -1,8 +1,8 @@
 {
   "name": "asedia",
   "main": "expo-router/entry",
-  "version": "1.7.0",
-  "private": true,
+  "version": "1.7.1",
+  "private": true,  
   "scripts": {
     "dev": "set EXPO_NO_TELEMETRY=1&& expo start",
     "build:web": "expo export --platform web",

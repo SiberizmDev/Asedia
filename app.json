@@ -2,7 +2,7 @@
   "expo": {
     "name": "Asedia",
     "slug": "asedia",
-    "version": "1.7.0", 
+    "version": "1.7.1", 
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "asedia",
@@ -16,7 +16,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.asena.space",
+      "bundleIdentifier": "com.nexa.asedia",
       "infoPlist": {
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true
@@ -25,7 +25,7 @@
       }
     },
     "android": {
-      "package": "com.asena.space",
+      "package": "com.nexa.asedia",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#101013"
